@@ -1,17 +1,9 @@
 ﻿public class ReplOptions
 {
-    public float Temperature { get; set; }
-    public int TopK { get; set; }
-    public int? Seed { get; set; }
-    public bool IsRunning { get; set; }
-    public int MaxTokens { get; set; }
-
-    public ReplOptions()
-    {
-        Temperature = 1.0f;
-        TopK = 5;
-        Seed = null;
-        IsRunning = true;
-        MaxTokens = 50;
-    }
+    public string CheckpointPath { get; set; } = "checkpoint.json";
+    public float Temperature { get; set; } = 0.3f;
+    public int TopK { get; set; } = 5;
+    public int? Seed { get; set; } = null;
+    public bool IsRunning { get; set; } = true;
+    public int MaxTokens { get; set; } = 50;
 }
