@@ -1,3 +1,5 @@
+using Contracts;
+
 public class ChatRepl
 {
     private ITextGenerator _generator;

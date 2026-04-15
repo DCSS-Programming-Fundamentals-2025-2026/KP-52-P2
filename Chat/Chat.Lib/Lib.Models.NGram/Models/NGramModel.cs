@@ -1,6 +1,6 @@
 ﻿using Contracts;
 using System.Text.Json;
-
+namespace Lib.Models.NGram;
 public class NGramModel : ILanguageModel, INGramModel
 {
     public float[][] _probs; 

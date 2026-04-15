@@ -1,11 +1,11 @@
 using Lib.Corpus.Configuration;
 using Lib.Corpus.Infrastructure;
 using Lib.Corpus.Processing;
-using MiniChatGPT.Contracts;
+using Contracts;
 
 namespace Lib.Corpus;
 
-public class CorpusLoader : ICorpusLoader, IContractFingerprint
+public class CorpusLoader : ICorpusLoader, IContractFingerprintChain
 {
     private readonly IFileSystem _fileSystem;
     public CorpusLoader(IFileSystem fileSystem)
@@ -13,7 +13,7 @@ public class CorpusLoader : ICorpusLoader, IContractFingerprint
         _fileSystem = fileSystem;
     }
 
-    public string GetContractFingerprint()
+    public string GetContractFingerprintChain()
     {
         return "Lib.Corpus:1.0.0:Corpus,CorpusLoader";
     }

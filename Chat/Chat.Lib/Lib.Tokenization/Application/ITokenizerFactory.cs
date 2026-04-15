@@ -1,4 +1,4 @@
-using MiniChatGPT.Contracts;
+using Contracts;
 
 namespace Lib.Tokenization.Application
 {

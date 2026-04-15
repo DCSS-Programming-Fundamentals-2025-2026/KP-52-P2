@@ -1,7 +1,4 @@
-﻿public interface ITextGenerator
-{
-    string Generate(string prompt, int maxTokens, float temperature, int topK, int? seed = null);
-}
+﻿using Contracts;
 
 public class CommandExecutionContext
 {

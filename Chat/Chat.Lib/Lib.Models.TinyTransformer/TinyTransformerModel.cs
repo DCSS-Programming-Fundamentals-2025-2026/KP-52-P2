@@ -12,6 +12,9 @@ namespace Lib.Models.TinyTransformer
         private readonly TinyTransformerWeights _weights;
         private readonly TransformerBlock _transformerBlock;
 
+        private float[][] _lastBlockOutput;
+        private float[][] _lastEmbeddings;
+
         public string ModelKind => "tinytransformer";
         public int VocabSize => _config.VocabSize;
         public int ContextSize => _config.ContextSize;
@@ -35,6 +38,63 @@ namespace Lib.Models.TinyTransformer
                 : context;
 
             return Forward(truncatedContext, _config.VocabSize, _config.EmbeddingSize);
+        }
+
+        public float TrainStep(ReadOnlySpan<int> context, int target, float lr)
+        {
+            if (context.Length == 0)
+            {
+                throw new ArgumentException("Context cannot be empty!");
+            }
+            if (target < 0 || target >= VocabSize)
+            {
+                throw new ArgumentOutOfRangeException(nameof(target));
+            }
+
+            float[] logits = NextTokenScores(context);
+
+            float[] probs = MathOps.Default.Softmax(logits);
+
+            float loss = MathOps.Default.CrossEntropyLoss(probs, target);
+
+            
+            float[] dLogits = CalculateGradient(probs, target);
+
+            Backward(context, dLogits, lr);
+
+            return loss;
+        }
+
+        private void Backward(ReadOnlySpan<int> context, float[] dLogits, float lr)
+        {
+            int embSize = _config.EmbeddingSize;
+            float[] lastHidden = _lastBlockOutput[_lastBlockOutput.Length - 1];
+            float[] dHidden = new float[embSize];
+
+            
+            for (int v = 0; v < VocabSize; v++)
+            {
+                float gradV = dLogits[v];
+                _weights.OutputBias[v] -= lr * gradV;
+
+                for (int i = 0; i < embSize; i++)
+                {
+                    float dWeight = gradV * lastHidden[i];
+                    _weights.OutputW[i, v] -= lr * dWeight;
+                    dHidden[i] += gradV * _weights.OutputW[i, v];
+                }
+            }
+
+            UpdateEmbeddings(context, dHidden, lr);
+        }
+
+        private void UpdateEmbeddings(ReadOnlySpan<int> context, float[] dHidden, float lr)
+        {
+            int lastTokenId = context[context.Length - 1];
+            for (int j = 0; j < _config.EmbeddingSize; j++)
+            {
+                _weights.TokenEmbeddings[lastTokenId, j] -= lr * dHidden[j];
+            }
         }
 
         private float[] Forward(ReadOnlySpan<int> context, int vocabSize, int embeddingSize)
@@ -79,6 +139,19 @@ namespace Lib.Models.TinyTransformer
             }
 
             return logits;
+        }
+
+        public float[] CalculateGradient(float[] probs, int target)
+        {
+            float[] dLogits = new float[probs.Length];
+            for (int i = 0; i < probs.Length; i++)
+            {
+                dLogits[i] = probs[i];
+            }
+
+            dLogits[target] -= 1.0f;
+            
+            return dLogits;
         }
 
         public TinyTransformerPayload ToPayload()

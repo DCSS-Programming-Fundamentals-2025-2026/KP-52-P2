@@ -1,8 +1,7 @@
 namespace Tests;
 
-using scr;
-using scr.Lib.Sampling.Processing;
-using scr.Processing;
+using Lib.Sampling;
+using Lib.Sampling.Processing;
 using NUnit.Framework;
 
 [TestFixture]
@@ -67,7 +66,7 @@ public class SamplerTests
         int topK = 3;
         int seed = 42; 
         
-        int result = sampler.Sample(probs, temp, topK, seed);
+        int result = sampler.SampleWithSeed(probs, temp, topK, seed);
         
         Assert.That(result, Is.EqualTo(1), "At normal temperatures, the algorithm should correctly handle a standard probability distribution.");
     }
@@ -81,7 +80,7 @@ public class SamplerTests
         int hugeTopK = 100;
         int seed = 100;
         
-        int result = sampler.Sample(probs, temp, hugeTopK, seed);
+        int result = sampler.SampleWithSeed(probs, temp, hugeTopK, seed);
         
         Assert.That(result, Is.GreaterThanOrEqualTo(0).And.LessThan(2), "The algorithm must work correctly even if TopK exceeds the size of the array.");
     }
@@ -95,7 +94,7 @@ public class SamplerTests
         int topK = 5;
         int seed = 99;
         
-        int result = sampler.Sample(probs, temp, topK, seed);
+        int result = sampler.SampleWithSeed(probs, temp, topK, seed);
         
         Assert.That(result, Is.EqualTo(0), "If the input array has only one element, the only possible index is 0.");
     }
@@ -128,5 +127,69 @@ public class SamplerTests
         float[] normHigh = ProbabilityNormalizer.Normalize(highTemp);
 
         Assert.That(normLow[1], Is.GreaterThan(normHigh[1]));
+    }
+
+    [Test]
+    public void Test8()
+    {
+        ISampler sampler = new Sampler();
+        
+        float[] probs = { 0.1f, 0.7f, 0.2f }; 
+        
+        float temp = 0.01f; 
+        int topK = 3;
+        int seed = 42; 
+        
+        int result = sampler.SampleWithSeed(probs, temp, topK, seed);
+        
+        Assert.That(result, Is.EqualTo(1));
+    }
+
+    [Test]
+    public void Test9()
+    {
+        ISampler sampler = new Sampler();
+        
+        float[] probs = { 0.1f, 0.7f, 0.2f }; 
+        
+        float temp = 1.0f; 
+        int topK = 1;
+        int seed = 42; 
+        
+        int result = sampler.SampleWithSeed(probs, temp, topK, seed);
+        
+        Assert.That(result, Is.EqualTo(1));
+    }
+
+    [Test]
+    public void Test10()
+    {
+        NucleusSampler sampler = new NucleusSampler();
+        
+        float[] probs = { 0.1f, 0.7f, 0.2f }; 
+        
+        float temp = 0.01f; 
+        float topP = 0.5f;
+        int seed = 42; 
+        
+        int result = sampler.SampleWithSeed(probs, temp, topP, seed);
+        
+        Assert.That(result, Is.EqualTo(1));
+    }
+
+    [Test]
+    public void Test11()
+    {
+        NucleusSampler sampler = new NucleusSampler();
+        
+        float[] probs = { 0.1f, 0.7f, 0.2f }; 
+        
+        float temp = 1.0f; 
+        float topP = 1.0f;
+        int seed = 42; 
+        
+        int result = sampler.SampleWithSeed(probs, temp, topP, seed);
+        
+        Assert.That(result, Is.EqualTo(1));
     }
 }

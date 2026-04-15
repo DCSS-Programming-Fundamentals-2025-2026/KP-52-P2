@@ -1,6 +1,6 @@
 using System.Text;
 using System.Text.RegularExpressions;
-using MiniChatGPT.Contracts;
+using Contracts;
 using Lib.Tokenization.Domain.Model;
 
 namespace Lib.Tokenization.Application

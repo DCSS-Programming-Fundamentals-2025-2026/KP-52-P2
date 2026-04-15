@@ -1,4 +1,4 @@
-namespace scr.Processing;
+namespace Lib.Sampling.Processing;
 
 public static class ProbabilityNormalizer
 {

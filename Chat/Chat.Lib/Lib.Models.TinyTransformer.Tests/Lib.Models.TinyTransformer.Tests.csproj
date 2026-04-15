@@ -22,9 +22,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Contracts\Contracts.csproj" />
     <ProjectReference Include="..\Lib.MathCore\Lib.MathCore.csproj" />
     <ProjectReference Include="..\Lib.Models.TinyTransformer\Lib.Models.TinyTransformer.csproj" />
+    <ProjectReference Include="..\..\Contracts\Contracts.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,7 +1,6 @@
-using scr.Processing;
-using scr.Lib.Sampling.Processing;
-
-namespace scr;
+using Lib.Sampling.Processing;
+using Lib.MathCore;
+namespace Lib.Sampling;
 
 public class NucleusSampler
 {
@@ -25,6 +24,11 @@ public class NucleusSampler
         if (rng == null)
         {
             rng = new Random();
+        }
+
+        if (temperature < 0.05f) 
+        {
+            return MathOps.Default.ArgMax(probs);
         }
 
         float[] logits = TemperatureScaler.Scale(probs, temperature);
@@ -74,20 +78,9 @@ public class NucleusSampler
         for (int i = 0; i < cutoff; i++)
             nucleus[i] /= sum;
 
-        float r = (float)rng.NextDouble();
-        float cumulativeProb = 0f;
+        int localIndex = MathOps.Default.SampleFromProbs(nucleus, rng);
 
-        for (int i = 0; i < cutoff; i++)
-        {
-            cumulativeProb += nucleus[i];
-
-            if (r <= cumulativeProb)
-            {
-                return nucleusIndices[i];
-            }
-        }
-
-        return nucleusIndices[^1];
+        return nucleusIndices[localIndex];
     }
 
     public int SampleWithSeed(float[] probs, float temperature, float topP, int seed)

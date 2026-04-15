@@ -1,4 +1,4 @@
-namespace scr;
+namespace Lib.Sampling;
 
 public interface ISampler
 {

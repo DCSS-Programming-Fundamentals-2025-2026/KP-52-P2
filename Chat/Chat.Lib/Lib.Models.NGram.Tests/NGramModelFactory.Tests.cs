@@ -1,5 +1,6 @@
 ﻿using Contracts;
-
+using Lib.Models.NGram;
+using Lib.Models.Trigram;
 public class NGramModelFactoryTests
 {
     [Test]

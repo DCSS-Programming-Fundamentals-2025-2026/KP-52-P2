@@ -1,4 +1,4 @@
-namespace scr.Lib.Sampling.Processing;
+namespace Lib.Sampling.Processing;
 
 public static class TopKSelector
 {

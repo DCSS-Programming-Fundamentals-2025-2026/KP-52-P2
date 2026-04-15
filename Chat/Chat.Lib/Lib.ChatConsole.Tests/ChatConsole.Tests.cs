@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using Contracts;
 using NUnit.Framework;
 
 namespace Lib.ChatConsole.Tests

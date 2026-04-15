@@ -1,4 +1,6 @@
-﻿public class TrigramModelTests
+﻿using Lib.Models.NGram;
+using Lib.Models.Trigram;
+public class TrigramModelTests
 {
     [Test]
     public void Train_NormalTokens()

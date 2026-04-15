@@ -1,4 +1,6 @@
-﻿public class PerplexityCalculator
+﻿using Lib.Models.NGram;
+using Lib.Models.Trigram;
+public class PerplexityCalculator
 {
     public float ComputePerplexityBigram(NGramModel model, ReadOnlySpan<int> tokens)
     {

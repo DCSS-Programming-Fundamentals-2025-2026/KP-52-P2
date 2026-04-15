@@ -1,5 +1,5 @@
 using System.Text.Json;
-using MiniChatGPT.Contracts;
+using Contracts;
 using Lib.Tokenization.Application;
 
 namespace Lib.Tokenization.Infrastructure.Serialization

@@ -1,5 +1,7 @@
 ﻿using Contracts;
+using Lib.Models.NGram;
 using System.Text.Json;
+namespace Lib.Models.Trigram;
 
 public class TrigramModel : ILanguageModel, INGramModel
 {

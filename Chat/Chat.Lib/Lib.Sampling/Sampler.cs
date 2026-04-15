@@ -1,7 +1,6 @@
-using scr.Lib.Sampling.Processing;
-using scr.Processing;
-
-namespace scr;
+using Lib.Sampling.Processing;
+using Lib.MathCore;
+namespace Lib.Sampling;
 
 public class Sampler : ISampler
 {
@@ -17,6 +16,11 @@ public class Sampler : ISampler
             rng = new Random();
         }
 
+        if (temperature < 0.05f || topK == 1)
+        {
+            return MathOps.Default.ArgMax(probs);
+        }
+
         float[] logits = TemperatureScaler.Scale(probs, temperature);
 
         int[] topKIndices = TopKSelector.GetTopKIndices(logits, topK);
@@ -30,19 +34,9 @@ public class Sampler : ISampler
 
         float[] topKProbs = ProbabilityNormalizer.Normalize(topKLogits);
 
-        float r = (float)rng.NextDouble();
-        float cumulative = 0f;
+        int localIndex = MathOps.Default.SampleFromProbs(topKProbs, rng);
 
-        for (int i = 0; i < topKProbs.Length; i++)
-        {
-            cumulative += topKProbs[i];
-            if (r <= cumulative)
-            {
-                return topKIndices[i];
-            }
-        }
-
-        return topKIndices[^1];
+        return topKIndices[localIndex];
     }
 
     public int SampleWithSeed(float[] probs, float temperature, int topK, int seed)

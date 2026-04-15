@@ -1,4 +1,5 @@
-using scr;
+using Contracts;
+using Lib.Sampling;
 class Program
 {
     static void Main(string[] args)

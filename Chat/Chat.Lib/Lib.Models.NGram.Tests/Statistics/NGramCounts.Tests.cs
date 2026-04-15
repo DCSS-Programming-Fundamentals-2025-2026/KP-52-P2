@@ -1,4 +1,6 @@
-﻿public class NGramCountsTests
+﻿using Lib.Models.NGram;
+using Lib.Models.Trigram;
+public class NGramCountsTests
 {
     [Test]
     public void CountBigrams_NormalTokens()

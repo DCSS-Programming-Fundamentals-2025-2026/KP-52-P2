@@ -1,4 +1,5 @@
-using scr;
+using Contracts;
+using Lib.Sampling;
 
 public class IntegratedMockModel : ITextGenerator
 {

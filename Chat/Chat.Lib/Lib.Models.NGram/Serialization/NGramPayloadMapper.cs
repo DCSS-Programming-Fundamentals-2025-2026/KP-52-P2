@@ -1,4 +1,6 @@
-﻿using System.Text.Json;
+﻿using Lib.Models.NGram;
+using Lib.Models.Trigram;
+using System.Text.Json;
 
 public class NGramPayloadMapper
 {

@@ -1,3 +1,4 @@
+using Contracts;
 public class BasicModel : ITextGenerator
 {
     public string Generate(string prompt, int maxTokens, float temperature, int topk, int? seed)

@@ -1,4 +1,6 @@
-﻿public class PerplexityCalculatorTests
+﻿using Lib.Models.NGram;
+using Lib.Models.Trigram;
+public class PerplexityCalculatorTests
 {
     [Test]
     public void ComputePerplexityBigram_NotEnoughTokens()

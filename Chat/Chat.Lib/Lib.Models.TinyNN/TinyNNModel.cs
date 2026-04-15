@@ -82,8 +82,7 @@ public class TinyNNModel : ILanguageModel
         float[] logits = NextTokenScores(context);
         float[] probs = mathOpsImpl.Softmax(logits);
 
-        float probsTarget = probs[target];
-        float loss = (float)Math.Log(probsTarget);
+        float loss = mathOpsImpl.CrossEntropyLoss(logits, target);
 
         float[] dLogits = CalculateGradient(probs, target);
 

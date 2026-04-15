@@ -1,6 +1,6 @@
 using System.Text.Json;
 using Lib.Tokenization.Domain.Model;
-using MiniChatGPT.Contracts;
+using Contracts;
 
 namespace Lib.Tokenization.Application
 {
