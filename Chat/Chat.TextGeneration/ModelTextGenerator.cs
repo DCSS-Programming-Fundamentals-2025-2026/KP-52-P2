@@ -63,17 +63,16 @@ public class ModelTextGenerator : ITextGenerator
 
             context.Add(nextToken);
             generated.Add(nextToken);
+            
+            string decodedText = tokenizer.Decode(new[] { nextToken });
+            Console.Write(decodedText);
 
-            if (generated.Count >= 5)
+            if (StopConditionEvaluator.ShouldStop(decodedText, generated.Count))
             {
-                string text = tokenizer.Decode(new[] { nextToken });
-
-                if (text == "." || text == "!" || text == "?")
-                {
-                    break;
-                }
+                break;
             }
         }
+        Console.WriteLine();
 
         return tokenizer.Decode(generated.ToArray());
     }
