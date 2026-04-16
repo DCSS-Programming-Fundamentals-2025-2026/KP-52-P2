@@ -4,6 +4,7 @@ using Contracts;
 using Lib.Tokenization.Application;
 using Lib.Models.TinyNN.Factories;
 using Lib.Models.NGram;
+using Lib.Models.TinyTransformer;
 
 namespace Chat
 {
@@ -65,11 +66,8 @@ namespace Chat
             }
             else if (modelKind == "tinytransformer")
             {
-                // TODO: Розкоментувати, коли команда B5 додасть фабрику
-                // TinyTransformerModelFactory factory = new TinyTransformerModelFactory();
-                // return factory.CreateFromPayload(jsonPayload, modelKind);
-                
-                throw new NotImplementedException("Фабрика для TinyTransformer ще не реалізована командою B5.");
+                TinyTransformerModelFactory factory = new TinyTransformerModelFactory();
+                return factory.CreateFromPayload(jsonPayload, modelKind);
             }
             else
             {
@@ -79,7 +77,7 @@ namespace Chat
 
         private void VerifyFingerprint(string expectedFingerprint, ILanguageModel model)
         {
-            string actualFingerprint = $"V1_{model.ModelKind}:vocabSize={model.VocabSize}";
+            string actualFingerprint = "V1_" + model.ModelKind + ":vocabSize=" + model.VocabSize;
 
             if (string.IsNullOrEmpty(expectedFingerprint))
             {
@@ -89,9 +87,9 @@ namespace Chat
 
             if (!expectedFingerprint.Contains(actualFingerprint))
             {
-                throw new Exception($"Помилка FingerPrint! Чекпоінт не сумісний з поточним кодом.\n" +
-                                    $"Очікувалося (у файлі): {expectedFingerprint}\n" +
-                                    $"Отримано (від моделі): {actualFingerprint}");
+                throw new Exception("Помилка FingerPrint! Чекпоінт не сумісний з поточним кодом.\n" +
+                                    "Очікувалося (у файлі): " + expectedFingerprint + "\n" +
+                                    "Отримано (від моделі): " + actualFingerprint);
             }
         }
     }
