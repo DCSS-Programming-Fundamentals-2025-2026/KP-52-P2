@@ -8,13 +8,15 @@ public class NGramModelFactoryTests
     {
         // Arrange
         NGramModelFactory factory = new NGramModelFactory();
-        NGramModel expectedModel = new NGramModel(4);
 
         // Act
         ILanguageModel actualModel = factory.Create("bigram", 4);
 
         // Assert
-        Assert.IsTrue(actualModel.Equals(expectedModel));
+        Assert.That(actualModel, Is.Not.Null);
+        Assert.That(actualModel, Is.InstanceOf<NGramModel>());
+
+        Assert.That(((NGramModel)actualModel).VocabSize, Is.EqualTo(4));
     }
 
     [Test]
@@ -22,13 +24,14 @@ public class NGramModelFactoryTests
     {
         // Arrange
         NGramModelFactory factory = new NGramModelFactory();
-        TrigramModel expectedModel = new TrigramModel(4);
 
         // Act
         ILanguageModel actualModel = factory.Create("trigram", 4);
 
         // Assert
-        Assert.IsTrue(actualModel.Equals(expectedModel));
+        Assert.That(actualModel, Is.Not.Null);
+        Assert.That(actualModel, Is.InstanceOf<TrigramModel>());
+        Assert.That(((TrigramModel)actualModel).VocabSize, Is.EqualTo(4));
     }
 
     [Test]

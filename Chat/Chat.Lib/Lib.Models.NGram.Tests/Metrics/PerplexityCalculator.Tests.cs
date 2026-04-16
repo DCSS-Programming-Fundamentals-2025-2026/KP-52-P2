@@ -47,7 +47,7 @@ public class PerplexityCalculatorTests
         float result = calculator.ComputePerplexityBigram(model, tokens);
 
         // Assert
-        Assert.IsTrue(result > 0);
+        Assert.That(result, Is.GreaterThan(0));
     }
 
     [Test]
@@ -65,7 +65,7 @@ public class PerplexityCalculatorTests
         float result = calculator.ComputePerplexityTrigram(model, tokens);
 
         // Assert
-        Assert.IsTrue(result > 0);
+        Assert.That(result, Is.GreaterThan(0));
     }
 }
 

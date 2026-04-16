@@ -127,8 +127,8 @@ namespace Lib.ChatConsole.Tests
 
             string output = writer.ToString();
 
-            StringAssert.Contains("/temp", output);
-            StringAssert.Contains("/quit", output);
+            Assert.That(output, Does.Contain("/temp"));
+            Assert.That(output, Does.Contain("/quit"));
         }
 
         private class FakeTextGenerator : ITextGenerator
