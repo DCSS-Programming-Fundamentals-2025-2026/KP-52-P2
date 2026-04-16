@@ -6,27 +6,38 @@ public class NGramPayloadMapper
 {
     public JsonElement FromBigramToJson(NGramModel model)
     {
-        Object obj = new
+        object obj = new
         {
-            modelKind = model.ModelKind,
-            modelPayload = new
-            {
-                bigramProbs = model._probs
-            },
-            contractFingerprintChain = $"|Lib.Models.NGram: {model.GetContractFingerprint()}|"
+            bigramProbs = model._probs
         };
 
-        string json = JsonSerializer.Serialize(obj);
-        JsonElement jsonElement = JsonSerializer.Deserialize<JsonElement>(json);
-        return jsonElement;
+        return JsonSerializer.SerializeToElement(obj); ;
     }
 
     public void FromJsonElementToBigram(JsonElement jsonElement, NGramModel model)
     {
-        var payload = jsonElement.GetProperty("modelPayload");
-        string probs = payload.GetProperty("bigramProbs").GetRawText();
-        model._probs = JsonSerializer.Deserialize<float[][]>(probs);
-        model.VocabSize = model._probs.Length;
+        if (!jsonElement.TryGetProperty("bigramProbs", out JsonElement probsElement))
+        {
+            throw new InvalidOperationException("Checkpoint is missing bigramProbs.");
+        }
+
+        float[][]? probs = JsonSerializer.Deserialize<float[][]>(probsElement.GetRawText());
+
+        if (probs == null || probs.Length == 0)
+        {
+            throw new InvalidOperationException("Failed to restore bigram probabilities.");
+        }
+
+        for (int i = 0; i < probs.Length; i++)
+        {
+            if (probs[i] == null || probs[i].Length != probs.Length)
+            {
+                throw new InvalidOperationException("Invalid bigram probability matrix shape.");
+            }
+        }
+
+        model._probs = probs;
+        model.VocabSize = probs.Length;
     }
 
     public JsonElement FromTrigramToJson(TrigramModel model)
@@ -38,41 +49,100 @@ public class NGramPayloadMapper
             temp.Add(newKey, pair.Value);
         }
 
-        Object obj = new
+        object obj = new
         {
-            modelKind = model.ModelKind,
-            modelPayload = new
-            {
-                bigramProbs = model.bigramModel._probs,
-                trigramProbs = temp
-            },
-            contractFingerprintChain = $"|Lib.Models.NGram: {model.GetContractFingerprint()}|"
+            bigramProbs = model.bigramModel._probs,
+            trigramProbs = temp
         };
 
-        string json = JsonSerializer.Serialize(obj);
-        JsonElement jsonElement = JsonSerializer.Deserialize<JsonElement>(json);
-        return jsonElement;
+        return JsonSerializer.SerializeToElement(obj);
     }
 
     public void FromJsonElementToTrigram(JsonElement jsonElement, TrigramModel model)
     {
-        var payload = jsonElement.GetProperty("modelPayload");
-        string bigramProbs = payload.GetProperty("bigramProbs").GetRawText();
-        string trigramProbs = payload.GetProperty("trigramProbs").GetRawText();
+        if (!jsonElement.TryGetProperty("bigramProbs", out JsonElement bigramElement))
+        {
+            throw new InvalidOperationException("Checkpoint is missing bigramProbs.");
+        }
 
-        model.bigramModel._probs = JsonSerializer.Deserialize<float[][]>(bigramProbs);
-        model.bigramModel.VocabSize = model.bigramModel._probs.Length;
+        if (!jsonElement.TryGetProperty("trigramProbs", out JsonElement trigramElement))
+        {
+            throw new InvalidOperationException("Checkpoint is missing trigramProbs.");
+        }
 
-        model.VocabSize = model.bigramModel.VocabSize;
-        Dictionary<string, float[]> temp = JsonSerializer.Deserialize<Dictionary<string, float[]>>(trigramProbs);
-        Dictionary<(int, int), float[]> oldDictionary = new Dictionary<(int, int), float[]>();
+        float[][]? bigramProbs = JsonSerializer.Deserialize<float[][]>(bigramElement.GetRawText());
+        if (bigramProbs == null || bigramProbs.Length == 0)
+        {
+            throw new InvalidOperationException("Failed to restore bigram probabilities.");
+        }
+
+        for (int i = 0; i < bigramProbs.Length; i++)
+        {
+            if (bigramProbs[i] == null || bigramProbs[i].Length != bigramProbs.Length)
+            {
+                throw new InvalidOperationException("Invalid bigram probability matrix shape.");
+            }
+        }
+
+        Dictionary<string, float[]>? temp = JsonSerializer.Deserialize<Dictionary<string, float[]>>(trigramElement.GetRawText());
+        if (temp == null)
+        {
+            throw new InvalidOperationException("Failed to restore trigram probabilities.");
+        }
+
+        int vocabSize = bigramProbs.Length;
+
+        model.bigramModel = new NGramModel(vocabSize);
+        model.bigramModel._probs = bigramProbs;
+        model.bigramModel.VocabSize = vocabSize;
+
+        model.VocabSize = vocabSize;
+        model._trigramProbs = CreateEmptyTrigramDictionary(vocabSize);
 
         foreach (var pair in temp)
         {
             string[] keys = pair.Key.Split(',');
-            oldDictionary[(int.Parse(keys[0].Trim()), int.Parse(keys[1].Trim()))] = pair.Value;
+            if (keys.Length != 2)
+            {
+                continue;
+            }
+
+            if (!int.TryParse(keys[0].Trim(), out int first))
+            {
+                continue;
+            }
+
+            if (!int.TryParse(keys[1].Trim(), out int second))
+            {
+                continue;
+            }
+
+            if (first < 0 || first >= vocabSize || second < 0 || second >= vocabSize)
+            {
+                continue;
+            }
+
+            if (pair.Value == null || pair.Value.Length != vocabSize)
+            {
+                continue;
+            }
+
+
+            model._trigramProbs[(first, second)] = (float[])pair.Value.Clone();
+        }
+    }
+    private static Dictionary<(int, int), float[]> CreateEmptyTrigramDictionary(int vocabSize)
+    {
+        Dictionary<(int, int), float[]> result = new Dictionary<(int, int), float[]>();
+
+        for (int i = 0; i < vocabSize; i++)
+        {
+            for (int j = 0; j < vocabSize; j++)
+            {
+                result[(i, j)] = new float[vocabSize];
+            }
         }
 
-        model._trigramProbs = oldDictionary;
+        return result;
     }
 }

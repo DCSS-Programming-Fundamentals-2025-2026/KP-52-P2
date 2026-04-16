@@ -21,11 +21,15 @@ public class NGramModelFactory : INGramModelFactory
 
     public ILanguageModel CreateFromPayload(string modelType, object payload)
     {
-        var jsonElement = (JsonElement)payload;
-        var modelPayload = jsonElement.GetProperty("modelPayload");
+        if (payload is not JsonElement jsonElement)
+            throw new ArgumentException("Payload must be a JsonElement");
+
         
-        var bigramProbs = modelPayload.GetProperty("bigramProbs");
-        int vocabSize = bigramProbs.GetArrayLength(); 
+        if (!jsonElement.TryGetProperty("bigramProbs", out JsonElement bigramElement))
+            throw new InvalidOperationException("Invalid JSON: missing bigramProbs");
+
+        
+        int vocabSize = bigramElement.GetArrayLength(); 
 
         if (modelType == "bigram")
         {
