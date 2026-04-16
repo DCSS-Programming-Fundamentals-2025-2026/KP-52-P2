@@ -6,26 +6,92 @@ namespace Contracts
 {
     public static class JsonCheckpointIO
     {
-        public static Checkpoint Load(string filePath)
+        private static readonly JsonSerializerOptions SerializerOptions = new JsonSerializerOptions
         {
-            if (!File.Exists(filePath))
+            PropertyNameCaseInsensitive = true,
+            WriteIndented = true
+        };
+
+        public static Checkpoint Load(string path)
+        {
+            if (string.IsNullOrWhiteSpace(path))
             {
-                throw new FileNotFoundException("Файл чекпоінту не знайдено за шляхом: " + filePath);
+                throw new ArgumentException("Path to checkpoint cannot be empty.", nameof(path));
             }
 
-            string jsonContent = File.ReadAllText(filePath);
+            if (!File.Exists(path))
+            {
+                throw new FileNotFoundException("Checkpoint file was not found.", path);
+            }
 
-            JsonSerializerOptions options = new JsonSerializerOptions();
-            options.PropertyNameCaseInsensitive = true;
+            string json = File.ReadAllText(path);
 
-            Checkpoint checkpoint = JsonSerializer.Deserialize<Checkpoint>(jsonContent, options);
+            if (string.IsNullOrWhiteSpace(json))
+            {
+                throw new InvalidDataException("Checkpoint file is empty.");
+            }
+
+            Checkpoint checkpoint = JsonSerializer.Deserialize<Checkpoint>(json, SerializerOptions);
 
             if (checkpoint == null)
             {
-                throw new InvalidOperationException("Не вдалося розпарсити чекпоінт.");
+                throw new InvalidDataException("Checkpoint JSON could not be deserialized.");
             }
 
+            Validate(checkpoint);
             return checkpoint;
+        }
+
+        public static void Save(string path, Checkpoint checkpoint)
+        {
+            if (string.IsNullOrWhiteSpace(path))
+            {
+                throw new ArgumentException("Path to checkpoint cannot be empty.", nameof(path));
+            }
+
+            if (checkpoint == null)
+            {
+                throw new ArgumentNullException(nameof(checkpoint));
+            }
+
+            Validate(checkpoint);
+
+            string directory = Path.GetDirectoryName(path);
+            if (!string.IsNullOrWhiteSpace(directory))
+            {
+                Directory.CreateDirectory(directory);
+            }
+
+            string json = JsonSerializer.Serialize(checkpoint, SerializerOptions);
+            File.WriteAllText(path, json);
+        }
+
+        private static void Validate(Checkpoint checkpoint)
+        {
+            if (string.IsNullOrWhiteSpace(checkpoint.ModelKind))
+            {
+                throw new InvalidDataException("Checkpoint ModelKind is missing.");
+            }
+
+            if (string.IsNullOrWhiteSpace(checkpoint.TokenizerKind))
+            {
+                throw new InvalidDataException("Checkpoint TokenizerKind is missing.");
+            }
+
+            if (checkpoint.TokenizerPayload == null)
+            {
+                throw new InvalidDataException("Checkpoint TokenizerPayload is missing.");
+            }
+
+            if (checkpoint.ModelPayload == null)
+            {
+                throw new InvalidDataException("Checkpoint ModelPayload is missing.");
+            }
+
+            if (string.IsNullOrWhiteSpace(checkpoint.ContractFingerprintChain))
+            {
+                throw new InvalidDataException("Checkpoint ContractFingerprintChain is missing.");
+            }
         }
     }
 }

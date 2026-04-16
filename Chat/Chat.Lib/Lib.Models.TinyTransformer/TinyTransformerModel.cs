@@ -99,11 +99,11 @@ namespace Lib.Models.TinyTransformer
 
         private float[] Forward(ReadOnlySpan<int> context, int vocabSize, int embeddingSize)
         {
-            float[][] embeddings = Embed(context, embeddingSize);
+            _lastEmbeddings = Embed(context, embeddingSize);
 
-            float[][] blockOutput = _transformerBlock.Forward(embeddings, _weights, embeddingSize);
+            _lastBlockOutput = _transformerBlock.Forward(_lastEmbeddings, _weights, embeddingSize);
 
-            float[] lastHidden = blockOutput[blockOutput.Length - 1];
+            float[] lastHidden = _lastBlockOutput[_lastBlockOutput.Length - 1];
 
             return Project(lastHidden, vocabSize);
         }
