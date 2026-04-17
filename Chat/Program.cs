@@ -1,16 +1,13 @@
 using System;
 using System.Globalization;
-using Contracts;
-using Lib.Sampling;
-using Lib.Corpus;
-using Lib.Corpus.Infrastructure;
-using Lib.Corpus.Configuration;
-using Lib.Tokenization.Application;
-using Lib.Models.TinyTransformer.Configuration;
-using Lib.Models.TinyTransformer.State;
-using Lib.Models.TinyTransformer.Factories;
 using Chat.TextGeneration;
-using Lib.Tokenization.Domain.Model;
+using Contracts;
+using Lib.Corpus;
+using Lib.Corpus.Configuration;
+using Lib.Corpus.Infrastructure;
+using Lib.Models.TinyTransformer.Factories;
+using Lib.Sampling;
+using Lib.Tokenization.Application;
 
 namespace Chat.App
 {

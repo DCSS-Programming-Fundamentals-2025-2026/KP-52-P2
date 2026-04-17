@@ -6,16 +6,16 @@ public static class CommandLineParser
 
         for (int i = 0; i < args.Length; i++)
         {
-            if (args[i] == "chat")
+            if (args[i] == "--chat")
             {
                 continue;
             }
-            else if (args[i] == "-checkpoint" && i + 1 < args.Length)
+            else if (args[i] == "--checkpoint" && i + 1 < args.Length)
             {
                 options.CheckpointPath = args[i + 1];
                 i++;
             }
-            else if (args[i] == "-temp" && i + 1 < args.Length)
+            else if (args[i] == "--temp" && i + 1 < args.Length)
             {
                 float parsedTemp = 0f;
                 if (float.TryParse(args[i + 1], out parsedTemp))
@@ -24,7 +24,7 @@ public static class CommandLineParser
                 }
                 i++;
             }
-            else if (args[i] == "-topk" && i + 1 < args.Length)
+            else if (args[i] == "--topk" && i + 1 < args.Length)
             {
                 int parsedTopK = 0;
                 if (int.TryParse(args[i + 1], out parsedTopK))
@@ -33,7 +33,7 @@ public static class CommandLineParser
                 }
                 i++;
             }
-            else if (args[i] == "-seed" && i + 1 < args.Length)
+            else if (args[i] == "--seed" && i + 1 < args.Length)
             {
                 int parsedSeed = 0;
                 if (int.TryParse(args[i + 1], out parsedSeed))

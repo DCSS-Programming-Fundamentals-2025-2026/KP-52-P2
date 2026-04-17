@@ -3,6 +3,7 @@ using System.Text.Json;
 using Contracts;
 using Lib.Tokenization.Application;
 using Lib.Models.TinyNN.Factories;
+using Lib.Models.TinyTransformer.Factories;
 using Lib.Models.NGram;
 using Lib.Models.TinyTransformer.Factories;
 
@@ -10,8 +11,8 @@ namespace Chat
 {
     public class ChatPipeline
     {
-        public ITokenizer Tokenizer { get; private set; }
-        public ILanguageModel Model { get; private set; }
+        public ITokenizer Tokenizer { get; private set; } = null!;
+        public ILanguageModel Model { get; private set; } = null!;
 
         public void InitializeCheckpoint(string checkpointPath)
         {

@@ -7,9 +7,9 @@ namespace Chat
     public class InteractiveRepl
     {
         private readonly ITextGenerator _generator;
-        private int _maxTokens;
+        private int _maxTokens { get; set; }
 
-        public InteractiveRepl(ITextGenerator generator, int maxTokens = 50)
+        public InteractiveRepl(ITextGenerator generator, int maxTokens)
         {
             _generator = generator;
             _maxTokens = maxTokens;
@@ -19,11 +19,10 @@ namespace Chat
         {
             Console.OutputEncoding = System.Text.Encoding.UTF8;
             Console.WriteLine("=== Mini-ChatGPT REPL ===");
-            Console.WriteLine("/help — список команд, /quit — вихід\n");
 
             while (true)
             {
-                Console.Write("\nКористувач> ");
+                Console.Write("\nUser: ");
                 string input = Console.ReadLine() ?? string.Empty;
 
                 if (string.IsNullOrWhiteSpace(input)) continue;
