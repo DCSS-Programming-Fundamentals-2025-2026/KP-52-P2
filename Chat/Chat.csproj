@@ -1,10 +1,23 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <DefaultItemExcludes>$(DefaultItemExcludes);Chat.Lib\**;Contracts\**</DefaultItemExcludes>
     <OutputType>Exe</OutputType>
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="Chat.Lib\Lib.ChatConsole.Tests\Lib.ChatConsole.Tests.csproj" />
+    <ProjectReference Include="Chat.Lib\Lib.ChatConsole\Lib.ChatConsole.csproj" />
+    <ProjectReference Include="Chat.Lib\Lib.Corpus\Lib.Corpus.csproj" />
+    <ProjectReference Include="Chat.Lib\Lib.MathCore\Lib.MathCore.csproj" />
+    <ProjectReference Include="Chat.Lib\Lib.Models.NGram\Lib.Models.NGram.csproj" />
+    <ProjectReference Include="Chat.Lib\Lib.Models.TinyNN\Lib.Models.TinyNN.csproj" />
+    <ProjectReference Include="Chat.Lib\Lib.Models.TinyTransformer\Lib.Models.TinyTransformer.csproj" />
+    <ProjectReference Include="Chat.Lib\Lib.Tokenization\Lib.Tokenization.csproj" />
+    <ProjectReference Include="Contracts\Contracts.csproj" />
+  </ItemGroup>
 
 </Project>

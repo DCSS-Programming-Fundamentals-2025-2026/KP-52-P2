@@ -1,6 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
+    <ProjectReference Include="..\Lib.Corpus\Lib.Corpus.csproj" />
+    <ProjectReference Include="..\Lib.Models.NGram\Lib.Models.NGram.csproj" />
     <ProjectReference Include="..\Lib.Sampling\scr.csproj" />
     <ProjectReference Include="..\..\Contracts\Contracts.csproj" />
   </ItemGroup>
