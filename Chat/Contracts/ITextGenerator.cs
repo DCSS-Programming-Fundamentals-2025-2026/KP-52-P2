@@ -2,7 +2,7 @@
 {
     public interface ITextGenerator
     {
-        
-        string Generate(string prompt, float temperature, int topK, int? seed);
+        string Generate(string prompt, int maxTokens=50,
+        float temperature=0.7f, int topK = 40, int? seed = null);
     }
 }

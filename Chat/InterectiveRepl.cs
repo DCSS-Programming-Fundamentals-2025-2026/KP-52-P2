@@ -78,7 +78,7 @@ namespace Chat
 
                 try
                 {
-                    string response = _generator.Generate(input, temperature, topK, seed);
+                    string response = _generator.Generate(input, 50, temperature, topK, seed);
                     Console.WriteLine($"Assistant: {response}");
                 }
                 catch (Exception ex)
