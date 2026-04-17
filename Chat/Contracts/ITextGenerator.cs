@@ -3,6 +3,6 @@
     public interface ITextGenerator
     {
         
-        string Generate(string prompt, float temperature, int topK, int? seed);
+        string Generate(string prompt, int maxTokens, float temperature, int topK, int? seed);
     }
 }

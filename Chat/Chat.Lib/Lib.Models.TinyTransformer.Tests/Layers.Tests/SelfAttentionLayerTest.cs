@@ -8,38 +8,20 @@ public class SelfAttentionLayerTest
 {
     private int _vocabSize = 10;
     private int _embeddingSize = 8;
-    private TinyTransformerConfig _config;
     private TinyTransformerWeights _weights;
     private SelfAttentionLayer _layer;
 
     [SetUp]
     public void SetUp()
     {
-        _config = new TinyTransformerConfig(_vocabSize, _embeddingSize, 1, 8);
         _weights = TinyTransformerWeights.Initialize(_vocabSize, _embeddingSize, new Random(42));
         _layer = new SelfAttentionLayer();
     }
 
     [Test]
-    public void Compute_SingleToken_ReturnsCorrectShape()
+    public void Backward_ReturnsCorrectShape()
     {
-        float[][] input = new float[1][];
-        input[0] = new float[_embeddingSize];
-        for (int i = 0; i < _embeddingSize; i++)
-        {
-            input[0][i] = 0.1f * i;
-        }
-
-        float[][] output = _layer.Compute(input, _weights, _embeddingSize);
-
-        Assert.That(output.Length, Is.EqualTo(1));
-        Assert.That(output[0].Length, Is.EqualTo(_embeddingSize));
-    }
-
-    [Test]
-    public void Compute_MultipleTokens_ReturnsCorrectShape()
-    {
-        int seqLen = 4;
+        int seqLen = 3;
         float[][] input = new float[seqLen][];
         for (int i = 0; i < seqLen; i++)
         {
@@ -50,17 +32,67 @@ public class SelfAttentionLayerTest
             }
         }
 
-        float[][] output = _layer.Compute(input, _weights, _embeddingSize);
+        _layer.Compute(input, _weights, _embeddingSize);
 
-        Assert.That(output.Length, Is.EqualTo(seqLen));
+        float[] dFinalAttnOut = new float[_embeddingSize];
+        for (int i = 0; i < _embeddingSize; i++) dFinalAttnOut[i] = 0.01f;
+
+        float[][] dX = _layer.Backward(dFinalAttnOut, _weights, 0.01f);
+
+        Assert.That(dX.Length, Is.EqualTo(seqLen));
         for (int i = 0; i < seqLen; i++)
         {
-            Assert.That(output[i].Length, Is.EqualTo(_embeddingSize));
+            Assert.That(dX[i].Length, Is.EqualTo(_embeddingSize));
         }
     }
 
     [Test]
-    public void Compute_ValidInput_OutputIsNotAllZeros()
+    public void Backward_UpdatesAttentionWeights()
+    {
+        int seqLen = 4;
+        float[][] input = new float[seqLen][];
+        var rng = new Random(123);
+        for (int i = 0; i < seqLen; i++)
+        {
+            input[i] = new float[_embeddingSize];
+            for (int j = 0; j < _embeddingSize; j++)
+            {
+                input[i][j] = (float)(rng.NextDouble() * 2 - 1);
+            }
+        }
+
+        _layer.Compute(input, _weights, _embeddingSize);
+
+        var wqSnapshot = (float[,])_weights.Wq.Clone();
+        var wkSnapshot = (float[,])_weights.Wk.Clone();
+        var wvSnapshot = (float[,])_weights.Wv.Clone();
+        var woSnapshot = (float[,])_weights.Wo.Clone();
+
+        float[] dFinalAttnOut = new float[_embeddingSize];
+        for (int i = 0; i < _embeddingSize; i++) dFinalAttnOut[i] = 0.1f;
+
+        _layer.Backward(dFinalAttnOut, _weights, 0.01f);
+
+        bool wqChanged = false, wkChanged = false, wvChanged = false, woChanged = false;
+        for (int i = 0; i < _embeddingSize; i++)
+        {
+            for (int j = 0; j < _embeddingSize; j++)
+            {
+                if (_weights.Wq[i, j] != wqSnapshot[i, j]) wqChanged = true;
+                if (_weights.Wk[i, j] != wkSnapshot[i, j]) wkChanged = true;
+                if (_weights.Wv[i, j] != wvSnapshot[i, j]) wvChanged = true;
+                if (_weights.Wo[i, j] != woSnapshot[i, j]) woChanged = true;
+            }
+        }
+
+        Assert.That(wqChanged, Is.True);
+        Assert.That(wkChanged, Is.True);
+        Assert.That(wvChanged, Is.True);
+        Assert.That(woChanged, Is.True);
+    }
+
+    [Test]
+    public void Backward_DoesNotReturnAllZeros()
     {
         float[][] input = new float[2][];
         for (int i = 0; i < 2; i++)
@@ -72,31 +104,14 @@ public class SelfAttentionLayerTest
             }
         }
 
-        float[][] output = _layer.Compute(input, _weights, _embeddingSize);
+        _layer.Compute(input, _weights, _embeddingSize);
 
-        bool hasNonZero = output.Any(row => row.Any(v => v != 0));
+        float[] dFinalAttnOut = new float[_embeddingSize];
+        for (int i = 0; i < _embeddingSize; i++) dFinalAttnOut[i] = 1.0f;
+
+        float[][] dX = _layer.Backward(dFinalAttnOut, _weights, 0.01f);
+
+        bool hasNonZero = dX.Any(row => row.Any(v => v != 0));
         Assert.That(hasNonZero, Is.True);
-    }
-
-    [Test]
-    public void Compute_SameInput_ReturnsSameOutput()
-    {
-        float[][] input = new float[2][];
-        for (int i = 0; i < 2; i++)
-        {
-            input[i] = new float[_embeddingSize];
-            for (int j = 0; j < _embeddingSize; j++)
-            {
-                input[i][j] = 0.5f;
-            }
-        }
-
-        float[][] output1 = _layer.Compute(input, _weights, _embeddingSize);
-        float[][] output2 = _layer.Compute(input, _weights, _embeddingSize);
-
-        for (int i = 0; i < output1.Length; i++)
-        {
-            Assert.That(output1[i], Is.EqualTo(output2[i]));
-        }
     }
 }

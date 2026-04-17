@@ -24,6 +24,8 @@ namespace Lib.Models.TinyTransformer
             _config = config;
             _weights = weights;
             _transformerBlock = new TransformerBlock();
+            _lastBlockOutput = Array.Empty<float[]>();
+            _lastEmbeddings = Array.Empty<float[]>();
         }
 
         public float[] NextTokenScores(ReadOnlySpan<int> context)
@@ -57,7 +59,6 @@ namespace Lib.Models.TinyTransformer
 
             float loss = MathOps.Default.CrossEntropyLoss(probs, target);
 
-            
             float[] dLogits = CalculateGradient(probs, target);
 
             Backward(context, dLogits, lr);
@@ -67,11 +68,12 @@ namespace Lib.Models.TinyTransformer
 
         private void Backward(ReadOnlySpan<int> context, float[] dLogits, float lr)
         {
+            dLogits = ClipVector(dLogits, 5.0f);
+
             int embSize = _config.EmbeddingSize;
             float[] lastHidden = _lastBlockOutput[_lastBlockOutput.Length - 1];
             float[] dHidden = new float[embSize];
 
-            
             for (int v = 0; v < VocabSize; v++)
             {
                 float gradV = dLogits[v];
@@ -85,15 +87,17 @@ namespace Lib.Models.TinyTransformer
                 }
             }
 
-            UpdateEmbeddings(context, dHidden, lr);
-        }
+            dHidden = ClipVector(dHidden, 5.0f);
 
-        private void UpdateEmbeddings(ReadOnlySpan<int> context, float[] dHidden, float lr)
-        {
-            int lastTokenId = context[context.Length - 1];
-            for (int j = 0; j < _config.EmbeddingSize; j++)
+            float[][] dEmbeddings = _transformerBlock.Backward(dHidden, _weights, lr);
+
+            for (int pos = 0; pos < context.Length; pos++)
             {
-                _weights.TokenEmbeddings[lastTokenId, j] -= lr * dHidden[j];
+                int tokenId = context[pos];
+                for (int j = 0; j < embSize; j++)
+                {
+                    _weights.TokenEmbeddings[tokenId, j] -= lr * dEmbeddings[pos][j];
+                }
             }
         }
 
@@ -135,7 +139,7 @@ namespace Lib.Models.TinyTransformer
                 {
                     sum += hidden[i] * _weights.OutputW[i, v];
                 }
-                logits[v] = sum;
+                logits[v] = Math.Clamp(sum, -10f, 10f);
             }
 
             return logits;
@@ -150,7 +154,7 @@ namespace Lib.Models.TinyTransformer
             }
 
             dLogits[target] -= 1.0f;
-            
+
             return dLogits;
         }
 
@@ -196,6 +200,19 @@ namespace Lib.Models.TinyTransformer
                 outputW = ToJaggedArray(_weights.OutputW),
                 outputBias = _weights.OutputBias
             };
+        }
+
+        private static float[] ClipVector(float[] v, float maxNorm)
+        {
+            float norm = 0f;
+            for (int i = 0; i < v.Length; i++) norm += v[i] * v[i];
+            norm = (float)Math.Sqrt(norm);
+            if (norm <= maxNorm) return v;
+
+            float scale = maxNorm / norm;
+            float[] result = new float[v.Length];
+            for (int i = 0; i < v.Length; i++) result[i] = v[i] * scale;
+            return result;
         }
 
         private static float[][] ToJaggedArray(float[,] matrix)
