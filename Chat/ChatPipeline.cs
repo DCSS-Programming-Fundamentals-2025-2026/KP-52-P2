@@ -5,7 +5,7 @@ using Lib.Tokenization.Application;
 using Lib.Models.TinyNN.Factories;
 using Lib.Models.TinyTransformer.Factories;
 using Lib.Models.NGram;
-using Lib.Models.TinyTransformer;
+using Lib.Models.TinyTransformer.Factories;
 
 namespace Chat
 {
@@ -23,7 +23,7 @@ namespace Chat
             Tokenizer = RestoreTokenizer(checkpoint.TokenizerKind, checkpoint.TokenizerPayload);
 
             Console.WriteLine("Відновлення моделі...");
-            Model = RestoreModel(checkpoint.ModelKind, Tokenizer.VocabSize, checkpoint.ModelPayload);
+            Model = RestoreModel(checkpoint.ModelKind, checkpoint.ModelPayload);
 
             Console.WriteLine("Перевірка FingerPrint...");
             VerifyFingerprint(checkpoint.ContractFingerprintChain, Model);
@@ -51,7 +51,7 @@ namespace Chat
             return factory.FromPayload(payload);
         }
 
-        private ILanguageModel RestoreModel(string modelKind, int vocabSize, object payload)
+        private ILanguageModel RestoreModel(string modelKind, object payload)
         {
             JsonElement jsonPayload = (JsonElement)payload;
 

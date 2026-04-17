@@ -148,4 +148,46 @@ public class TinyTransformerModelTest
         Assert.That(sampledToken, Is.GreaterThanOrEqualTo(0));
         Assert.That(sampledToken, Is.LessThan(_vocabSize));
     }
+
+    [Test]
+    public void TrainStep_DecreasesLossOverIterations()
+    {
+        int[] context = { 1, 2, 3 };
+        int target = 5;
+        float lr = 0.1f;
+
+        float firstLoss = _model.TrainStep(context, target, lr);
+
+        for (int i = 0; i < 50; i++)
+        {
+            _model.TrainStep(context, target, lr);
+        }
+
+        float lateLoss = _model.TrainStep(context, target, lr);
+
+        Assert.That(lateLoss, Is.LessThan(firstLoss));
+    }
+
+    [Test]
+    public void TrainStep_UpdatesAllWeightMatrices()
+    {
+        var ffn1Snapshot = (float[,])_weights.Ffn1.Clone();
+        var ffn2Snapshot = (float[,])_weights.Ffn2.Clone();
+        var embSnapshot = (float[,])_weights.TokenEmbeddings.Clone();
+
+        int[] context = { 0, 3, 5, 7, 2, 4, 1, 6 };
+        _model.TrainStep(context, 5, 0.5f);
+
+        bool AnyChanged(float[,] a, float[,] b)
+        {
+            for (int i = 0; i < a.GetLength(0); i++)
+                for (int j = 0; j < a.GetLength(1); j++)
+                    if (a[i, j] != b[i, j]) return true;
+            return false;
+        }
+
+        Assert.That(AnyChanged(_weights.Ffn1, ffn1Snapshot), Is.True);
+        Assert.That(AnyChanged(_weights.Ffn2, ffn2Snapshot), Is.True);
+        Assert.That(AnyChanged(_weights.TokenEmbeddings, embSnapshot), Is.True);
+    }
 }

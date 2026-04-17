@@ -19,5 +19,11 @@ namespace Lib.Models.TinyTransformer.Layers
 
             return result;
         }
+
+        public float[][] Backward(float[] dBlockOutputLastPos, TinyTransformerWeights weights, float lr)
+        {
+            float[] dAttnOutLastPos = _ffn.Backward(dBlockOutputLastPos, weights, lr);
+            return _attention.Backward(dAttnOutLastPos, weights, lr);
+        }
     }
 }
