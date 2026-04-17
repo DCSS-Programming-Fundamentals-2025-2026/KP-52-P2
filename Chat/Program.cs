@@ -1,23 +1,57 @@
 ﻿using System;
 using Contracts;
+using Chat;
+using Chat.TextGeneration;
 using Lib.Sampling;
 
-namespace Chat.App
+class Program
 {
-    class Program
+    static void Main(string[] args)
     {
-        static void Main(string[] args)
+        Console.OutputEncoding = System.Text.Encoding.UTF8;
+        Console.WriteLine("Консольне тестування системи Mini-ChatGPT.");
+
+        ReplOptions options = CommandLineParser.Parse(args);
+
+        ITextGenerator generator;
+
+        if (!string.IsNullOrEmpty(options.CheckpointPath))
         {
-            Console.WriteLine("Starting Chat System...");
+            try
+            {
 
-            var options = CommandLineParser.Parse(args);
+                ChatPipeline pipeline = new ChatPipeline();
+                pipeline.InitializeCheckpoint(options.CheckpointPath);
 
-            ISampler sampler = new Sampler();
-            ITextGenerator model = new IntegratedMockModel(sampler);
-
-            var chat = new InteractiveRepl(model);
-
-            chat.Run(options.Temperature, options.TopK, options.Seed);
+                
+                ISampler sampler = new Sampler();
+                
+                
+                generator = new ModelTextGenerator(
+                    pipeline.Model, 
+                    pipeline.Tokenizer, 
+                    sampler
+                );
+                
+                Console.WriteLine($"[System] Model loaded from: {options.CheckpointPath}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[Critical Error] Failed to load checkpoint: {ex.Message}");
+                Console.WriteLine("[System] Falling back to Mock Model...");
+                generator = new IntegratedMockModel(new Sampler());
+            }
         }
+        else
+        {
+            Console.WriteLine("[System] No checkpoint specified. Starting with IntegratedMockModel.");
+            generator = new IntegratedMockModel(new Sampler());
+        }
+
+
+        ChatRepl chat = new ChatRepl(generator);
+        
+        
+        chat.Run(options.Temperature, options.TopK, options.Seed);
     }
 }

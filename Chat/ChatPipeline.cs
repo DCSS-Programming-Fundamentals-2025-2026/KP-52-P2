@@ -3,6 +3,7 @@ using System.Text.Json;
 using Contracts;
 using Lib.Tokenization.Application;
 using Lib.Models.TinyNN.Factories;
+using Lib.Models.TinyTransformer.Factories;
 using Lib.Models.NGram;
 using Lib.Models.TinyTransformer;
 
@@ -10,8 +11,8 @@ namespace Chat
 {
     public class ChatPipeline
     {
-        public ITokenizer Tokenizer { get; private set; }
-        public ILanguageModel Model { get; private set; }
+        public ITokenizer Tokenizer { get; private set; } = null!;
+        public ILanguageModel Model { get; private set; } = null!;
 
         public void InitializeCheckpoint(string checkpointPath)
         {
@@ -57,7 +58,7 @@ namespace Chat
             if (modelKind == "bigram" || modelKind == "trigram")
             {
                 NGramModelFactory factory = new NGramModelFactory();
-                return factory.CreateFromPayload(modelKind, vocabSize, jsonPayload);
+                return factory.CreateFromPayload(modelKind, jsonPayload);
             }
             else if (modelKind == "tinynn")
             {
@@ -67,7 +68,7 @@ namespace Chat
             else if (modelKind == "tinytransformer")
             {
                 TinyTransformerModelFactory factory = new TinyTransformerModelFactory();
-                return factory.CreateFromPayload(jsonPayload, modelKind);
+                return factory.CreateFromPayload(jsonPayload);
             }
             else
             {
