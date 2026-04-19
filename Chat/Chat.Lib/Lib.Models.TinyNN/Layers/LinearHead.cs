@@ -51,6 +51,18 @@ namespace Lib.Models.TinyNN.Layers
 
         public float[] Backward(float[] hidden, float[] dLogits, float lr)
         {
+            float[] dHidden = new float[hidden.Length];
+            for (int i = 0; i < _weights.OutputWeights.Length; i++)
+            {
+                float component = 0;
+                for (int j = 0; j < _weights.OutputWeights[0].Length; j++)
+                {
+                    component += _weights.OutputWeights[i][j] * dLogits[j];
+                }
+
+                dHidden[i] = component;
+            }
+
             float[][] gradient = new float[_config.EmbeddingSize][];
             for (int i = 0; i < gradient.Length; i++)
                 gradient[i] = new float[VocabSize];
@@ -73,18 +85,6 @@ namespace Lib.Models.TinyNN.Layers
 
             for (int i = 0; i < _weights.OutputBias.Length; i++)
                 _weights.OutputBias[i] -= lr * dLogits[i];
-
-            float[] dHidden = new float[hidden.Length];
-            for (int i = 0; i < _weights.OutputWeights.Length; i++)
-            {
-                float component = 0;
-                for (int j = 0; j < _weights.OutputWeights[0].Length; j++)
-                {
-                    component += _weights.OutputWeights[i][j] * dLogits[j];    
-                }
-
-                dHidden[i] = component;
-            }
 
             return dHidden;
         }
