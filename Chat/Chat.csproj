@@ -16,6 +16,7 @@
     <ProjectReference Include="Chat.Lib\Lib.Corpus\Lib.Corpus.csproj" />
     <ProjectReference Include="Chat.Lib\Lib.Models.TinyTransformer\Lib.Models.TinyTransformer.csproj" />
     <ProjectReference Include="Chat.Lib\Lib.Models.NGram\Lib.Models.NGram.csproj" />
+    <ProjectReference Include="Chat.Lib\Lib.Models.TinyNN\Lib.Models.TinyNN.csproj" />
   </ItemGroup>
 
   <ItemGroup>

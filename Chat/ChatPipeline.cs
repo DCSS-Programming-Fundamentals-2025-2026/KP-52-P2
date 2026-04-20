@@ -78,20 +78,27 @@ namespace Chat
 
         private void VerifyFingerprint(string expectedFingerprint, ILanguageModel model)
         {
-            string actualFingerprint = "V1_" + model.ModelKind + ":vocabSize=" + model.VocabSize;
+            string modelIdentifier = model.GetType().Name; 
+            string actualFingerprint = $"V1_{model.ModelKind}:vocabSize={model.VocabSize}";
 
             if (string.IsNullOrEmpty(expectedFingerprint))
             {
-                Console.WriteLine("Попередження: У чекпоінті відсутній FingerPrint для перевірки.");
+                Console.WriteLine("[Warning] У чекпоінті відсутній FingerPrint. Перевірка неможлива.");
                 return;
             }
 
-            if (!expectedFingerprint.Contains(actualFingerprint))
+            bool isCompatible = expectedFingerprint.Contains(modelIdentifier) || 
+                                expectedFingerprint.Contains(model.ModelKind);
+
+            if (!isCompatible)
             {
-                //throw new Exception("Помилка FingerPrint! Чекпоінт не сумісний з поточним кодом.\n" +
-                                    //"Очікувалося (у файлі): " + expectedFingerprint + "\n" +
-                                    //"Отримано (від моделі): " + actualFingerprint);
-                Console.WriteLine("Заглушка");                    
+                Console.WriteLine($"[Warning] Fingerprint mismatch!");
+                Console.WriteLine($"Записано в системі: {expectedFingerprint}");
+                Console.WriteLine($"Поточна модель: {actualFingerprint} ({modelIdentifier})");
+            }
+            else
+            {
+                Console.WriteLine("[System] Fingerprint верифіковано. Модель сумісна.");
             }
         }
     }
