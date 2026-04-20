@@ -39,6 +39,7 @@ class Program
             {
                 Console.WriteLine($"[Critical Error] Failed to load checkpoint: {ex.Message}");
                 Console.WriteLine("[System] Falling back to Mock Model...");
+                Console.WriteLine($"[Stack Trace]: {ex.StackTrace}");
                 generator = new IntegratedMockModel(new Sampler());
             }
         }

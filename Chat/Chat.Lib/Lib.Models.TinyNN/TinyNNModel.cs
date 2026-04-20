@@ -80,9 +80,32 @@ public class TinyNNModel : ILanguageModel
         float[] hidden = Embedding.EncodeContext(tokens);
 
         float[] logits = NextTokenScores(context);
-        float[] probs = mathOpsImpl.Softmax(logits);
+        for (int i = 0; i < logits.Length; i++)
+        {
+            if (float.IsNaN(logits[i]))
+            {
+                throw new ArgumentException("Logit in train step became NaN");     
+            }
+            else if (logits[i] == float.NegativeInfinity)
+            {
+                throw new ArgumentException("Logit in train step became negative infinity");
+            }
+            else if (logits[i] == float.PositiveInfinity)
+            {
+                throw new ArgumentException("Logit in train step became positive infinity");
+            }
+        }
 
-        float loss = mathOpsImpl.CrossEntropyLoss(logits, target);
+        float[] probs = mathOpsImpl.Softmax(logits);
+        float probsTarget = probs[target];
+
+        float epsilon = 0.0000001f;
+        if (probsTarget < epsilon)
+        {
+            probsTarget = epsilon;
+        }
+
+        float loss = (float)Math.Log(probsTarget);
 
         float[] dLogits = CalculateGradient(probs, target);
 

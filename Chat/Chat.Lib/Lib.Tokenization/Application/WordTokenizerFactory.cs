@@ -14,7 +14,7 @@ namespace Lib.Tokenization.Application
         public ITokenizer FromPayload(object payload)
         {
             JsonElement json = (JsonElement)payload;
-            string[] restored = json.GetProperty("Words").Deserialize<string[]>();
+            string[] restored = json.GetProperty("words").Deserialize<string[]>();
             var vocab = new WordVocabulary();
             
             for (int i = 1; i < restored.Length; i++)
