@@ -97,7 +97,15 @@ public class TinyNNModel : ILanguageModel
         }
 
         float[] probs = mathOpsImpl.Softmax(logits);
-        float loss = (float)Math.Log(probs[target]);
+        float probsTarget = probs[target];
+
+        float epsilon = 0.0000001f;
+        if (probsTarget < epsilon)
+        {
+            probsTarget = epsilon;
+        }
+
+        float loss = (float)Math.Log(probsTarget);
 
         float[] dLogits = CalculateGradient(probs, target);
 
