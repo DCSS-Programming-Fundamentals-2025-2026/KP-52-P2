@@ -65,7 +65,6 @@ public class ModelTextGenerator : ITextGenerator
             generated.Add(nextToken);
             
             string decodedText = tokenizer.Decode(new[] { nextToken });
-            Console.Write(decodedText);
 
             if (StopConditionEvaluator.ShouldStop(decodedText, generated.Count))
             {
