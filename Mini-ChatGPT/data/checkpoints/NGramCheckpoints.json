@@ -1,0 +1,18 @@
+{
+  "modelKind": "bigram",
+  "tokenizerKind": "word",
+  "tokenizerPayload": {
+    "words": [
+      null
+    ]
+  },
+  "modelPayload": {
+    "bigramProbs": [
+      [
+        0
+      ]
+    ]
+  },
+  "seed": 42,
+  "contractFingerprintChain": "Lib.Corpus:1.0.0:Corpus,CorpusLoader|Lib.Tokenization:v1.0:WordTokenizer|Lib.Models.NGram:1.0.0:NGramModel,TrigramModel,NGramModelFactory"
+}
