@@ -143,7 +143,7 @@ namespace MiniChatGPT.App
                 Console.WriteLine($"NGram count: {metrics.NGramCount}");
                 Console.WriteLine($"Perpelity: {metrics.Perplexity}");
 
-            }
+            }                                                                     
             catch (Exception ex)
             {
                 Console.WriteLine($"[Training Error]: {ex.Message}");
