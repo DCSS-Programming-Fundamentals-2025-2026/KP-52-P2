@@ -20,6 +20,7 @@
     <ProjectReference Include="..\..\src\Contracts\Contracts.csproj" />
     <ProjectReference Include="..\..\src\Lib.Batching\Lib.Batching.csproj" />
     <ProjectReference Include="..\..\src\Lib.Corpus\Lib.Corpus.csproj" />
+    <ProjectReference Include="..\..\src\Lib.Models.NGram\Lib.Models.NGram.csproj" />
     <ProjectReference Include="..\..\src\Lib.Models.TinyNN\Lib.Models.TinyNN.csproj" />
     <ProjectReference Include="..\..\src\Lib.Tokenization\Lib.Tokenization.csproj" />
     <ProjectReference Include="..\..\src\Lib.Training\Lib.Training.csproj" />
