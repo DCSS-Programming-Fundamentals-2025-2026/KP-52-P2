@@ -1,5 +1,6 @@
 ﻿using Lib.Models.TinyNN.Configuration;
 using Lib.Models.TinyNN.State;
+using System.Numerics;
 using System.Runtime.CompilerServices;
 
 [assembly: InternalsVisibleTo("Lib.Models.TinyNN.Tests")]
@@ -20,6 +21,11 @@ namespace Lib.Models.TinyNN.Layers
 
         public float[] Project(float[] hidden)
         {
+            for (int i = 0; i < hidden.Length; i++)
+            {
+                hidden[i] = Math.Max(hidden[i], 0);
+            }
+
             float[] vector = MultiplyHiddenOnWeights(hidden);
             float[] logits = AddBiasToVector(vector);
             return logits; 
@@ -63,7 +69,19 @@ namespace Lib.Models.TinyNN.Layers
                 dHidden[i] = component;
             }
 
+            for (int i = 0; i < hidden.Length; i++)
+            {
+                int relu = 0;
+                if (hidden[i] > 0)
+                {
+                    relu = 1;
+                }
+
+                dHidden[i] *= relu;
+            }
+
             float[][] gradient = new float[_config.EmbeddingSize][];
+
             for (int i = 0; i < gradient.Length; i++)
                 gradient[i] = new float[VocabSize];
 

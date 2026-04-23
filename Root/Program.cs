@@ -15,14 +15,25 @@ using Lib.Tokenization.Application;
 using Lib.Training;
 using Lib.Training.Configuration;           
 using Lib.Sampling;
+using System.Text.Json;
+using Lib.Training.Metrics;
 
 namespace MiniChatGPT.App
 {
-    class Program
+    public class Program
     {
         static void Main(string[] args)
         {
-            if (args.Length == 0) { PrintGeneralUsage(); return; }
+            if (args.Length == 0)
+            {
+                PrintGeneralUsage();
+
+                Console.WriteLine();
+                Console.WriteLine();
+
+                PrintTrainUsage();
+                return;
+            }
 
             ReplOptions options = CommandLineParser.Parse(args);
             string command = args[0].ToLowerInvariant();
@@ -71,10 +82,7 @@ namespace MiniChatGPT.App
                 string effectiveModelKind;
                 string effectiveTokenizerKind;
 
-                bool resume = !string.IsNullOrWhiteSpace(options.OutputPath) &&
-                              File.Exists(options.OutputPath);
-
-                if (resume)
+                if (!string.IsNullOrWhiteSpace(options.OutputPath) && File.Exists(options.OutputPath))
                 {
                     Console.WriteLine($"[Trainer] Checkpoint found. Resuming from {options.OutputPath}...");
 
@@ -127,19 +135,14 @@ namespace MiniChatGPT.App
                 ITokenStream stream = new ArrayTokenStream(tokens);
                 IBatchProvider batchProvider = new TokenBatchProvider(stream, new BatchWindowSampler());
 
-                trainingLoop.Train(model, batchProvider, tConfig, bConfig, tokens, options.OutputPath);
+                TrainingMetrics metrics = trainingLoop.Train(model, batchProvider, tConfig, bConfig, tokens, options.OutputPath, effectiveTokenizerKind, tokenizer, options.Seed);
 
-                var checkpointToSave = new Checkpoint(
-                    ModelKind: model.ModelKind,
-                    TokenizerKind: effectiveTokenizerKind,
-                    TokenizerPayload: System.Text.Json.JsonSerializer.SerializeToElement(tokenizer.GetPayloadForCheckpoint()),
-                    ModelPayload: model.GetPayloadForCheckpoint(),
-                    Seed: options.Seed ?? 42,
-                    ContractFingerprintChain: $"V1_{model.ModelKind}:vocabSize={tokenizer.VocabSize}"
-                );
+                Console.WriteLine($"Average loss: {metrics.AverageLoss}");
+                Console.WriteLine($"Elapsed time: {metrics.ElapsedTime}");
+                Console.WriteLine($"Total steps: {metrics.TotalSteps}");
+                Console.WriteLine($"NGram count: {metrics.NGramCount}");
+                Console.WriteLine($"Perpelity: {metrics.Perplexity}");
 
-                JsonCheckpointIO.Save(options.OutputPath, checkpointToSave);
-                Console.WriteLine($"[Success] Model saved to {options.OutputPath}");
             }
             catch (Exception ex)
             {
@@ -147,7 +150,7 @@ namespace MiniChatGPT.App
             }
         }
 
-        static ITokenizer RestoreTokenizer(string tokenizerKind, object payload)
+        public static ITokenizer RestoreTokenizer(string tokenizerKind, object payload)
         {
             ITokenizerFactory factory;
 
@@ -169,7 +172,7 @@ namespace MiniChatGPT.App
 
         static ILanguageModel RestoreModel(string modelKind, object payload)
         {
-            System.Text.Json.JsonElement jsonPayload = (System.Text.Json.JsonElement)payload;
+            JsonElement jsonPayload = (JsonElement)payload;
 
             if (modelKind == "bigram" || modelKind == "trigram")
             {
@@ -179,7 +182,7 @@ namespace MiniChatGPT.App
             else if (modelKind == "tinynn")
             {
                 TinyNNModelFactory factory = new TinyNNModelFactory();
-                return factory.CreateFromPayload(jsonPayload, modelKind);
+                return factory.CreateFromPayload(jsonPayload, modelKind);    
             }
             else if (modelKind == "tinytransformer")
             {
@@ -221,7 +224,9 @@ namespace MiniChatGPT.App
             Console.WriteLine("  --tokenizer <type> Тип: word, char");
             Console.WriteLine("  --epochs <int>     Кількість епох");
             Console.WriteLine("  --lr <float>       Learning rate");
-            Console.WriteLine("  --out <path>       Шлях для збереження чекпоінту");
+            Console.WriteLine("  --batch <size>     Кількість батчів для тренування");
+            Console.WriteLine("  --block <size>     Розмір кількість токенів, що враховуватимуться під час тренування");
+            Console.WriteLine("  --interval <value>      Інтервал збереження чекпоінтуіі");
         }
     }
 }

@@ -138,6 +138,17 @@ public class LinearHeadTest
             expectedDHidden[i] = component;
         }
 
+        for (int i = 0; i < hidden.Length; i++)
+        {
+            int relu = 0;
+            if (hidden[i] > 0)
+            {
+                relu = 1;
+            }
+
+            expectedDHidden[i] *= relu;
+        }
+
         float[] dHidden = _linearhead.Backward(hidden, dLogits, lr);
 
         for (int i = 0; i < dHidden.Length; i++)

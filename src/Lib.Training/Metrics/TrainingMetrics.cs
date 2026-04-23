@@ -17,7 +17,7 @@ namespace Lib.Training.Metrics
             NGramCount = 0;
         }
 
-        public void UpdateTinyNN(int currentEpoch, float averageLoss, int totalSteps, TimeSpan elapsedTime)
+        public void UpdateNN(int currentEpoch, float averageLoss, int totalSteps, TimeSpan elapsedTime)
         {
             if(currentEpoch < 0 || averageLoss < 0 || totalSteps < 0 || elapsedTime < TimeSpan.Zero)
             {

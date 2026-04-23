@@ -17,7 +17,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Root\Root.csproj" />
     <ProjectReference Include="..\..\src\Lib.Models.NGram\Lib.Models.NGram.csproj" />
+    <ProjectReference Include="..\..\src\Lib.Tokenization\Lib.Tokenization.csproj" />
     <ProjectReference Include="..\..\src\Lib.Training\Lib.Training.csproj" />
     <ProjectReference Include="..\..\src\Contracts\Contracts.csproj" />
   </ItemGroup>

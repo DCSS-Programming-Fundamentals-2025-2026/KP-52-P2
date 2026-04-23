@@ -15,6 +15,14 @@ namespace AcceptanceTests
 {
     public class CheckpointTests
     {
+        private int? seed;
+
+        [SetUp]
+        public void Setup()
+        {
+            seed = 42;
+        }
+
         [Test]
         public void CheckpointTrigram_ContainsValidFields()
         {
@@ -39,7 +47,7 @@ namespace AcceptanceTests
             TrainingConfig tConfig = new TrainingConfig(100, 0.1f, 10);
             BatchConfig bConfig = new BatchConfig(50, 16);
 
-            var metrics = trainingLoop.Train(model, batchProvider, tConfig, bConfig, tokens, "../../../../../data/checkpoints/NGramCheckpoints.json");
+            var metrics = trainingLoop.Train(model, batchProvider, tConfig, bConfig, tokens, "../../../../../data/checkpoints/NGramCheckpoints.json", tokenizerKind, tokenizer, seed);
 
             Checkpoint checkpoint = new Checkpoint(
                 ModelKind: model.ModelKind,

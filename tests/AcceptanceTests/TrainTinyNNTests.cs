@@ -19,6 +19,7 @@ namespace AcceptanceTests
 {
     public class TrainTinyNNTests
     {
+        private int? seed;
         private TinyNNModelFactory _tinyNNFactory;
         private BatchConfig _batchConfig;
         private TrainingConfig _trainingConfig;
@@ -30,6 +31,7 @@ namespace AcceptanceTests
         [SetUp]
         public void Setup()
         {
+            seed = 42;
             _batchConfig = new BatchConfig(8, 16);
             _training = new TrainingLoop();
             _trainingConfig = new TrainingConfig(10, 0.01f, 2);
@@ -56,7 +58,7 @@ namespace AcceptanceTests
             BatchWindowSampler windowSampler = new BatchWindowSampler();
             IBatchProvider batchProvider = new TokenBatchProvider(tokenStream, windowSampler);
 
-            _training.Train(model, batchProvider, _trainingConfig, _batchConfig, null, "../../../../../data/checkpoints/TinyNNCheckpoints.json");
+            _training.Train(model, batchProvider, _trainingConfig, _batchConfig, null, "../../../../../data/checkpoints/TinyNNCheckpoints.json", "word", tokenizer, seed);
 
             float[] scoresBefore = model.NextTokenScores(tokens);
 

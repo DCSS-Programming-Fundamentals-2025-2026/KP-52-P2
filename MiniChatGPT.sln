@@ -13,12 +13,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "data", "data", "{3E0F152A-8
 	ProjectSection(SolutionItems) = preProject
 		data\max_trigram_data.txt = data\max_trigram_data.txt
 		data\mediumspace.txt = data\mediumspace.txt
-		data\part01.txt = data\part01.txt
 		data\sample.txt = data\sample.txt
 		data\short_input.txt = data\short_input.txt
 		data\showcase.txt = data\showcase.txt
 		data\showcase2.txt = data\showcase2.txt
 		data\showcase3.txt = data\showcase3.txt
+		data\Ukraine.txt = data\Ukraine.txt
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{8E3F8DE6-45D0-4251-A054-92255B5E2340}"
