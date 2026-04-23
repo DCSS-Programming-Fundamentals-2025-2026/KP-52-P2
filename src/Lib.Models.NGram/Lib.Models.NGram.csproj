@@ -8,7 +8,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Contracts\Contracts.csproj" />
-    <ProjectReference Include="..\Lib.Tokenization\Lib.Tokenization.csproj" />
   </ItemGroup>
 
 </Project>

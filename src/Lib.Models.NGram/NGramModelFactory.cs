@@ -1,10 +1,9 @@
 ﻿using Contracts;
-using Lib.Models.NGram;
-using Lib.Models.Trigram;
 using Lib.Models.NGram.Serialization;
 using System.Text.Json;
 
 namespace Lib.Models.NGram.Factories;
+
 public class NGramModelFactory : INGramModelFactory
 {
     public ILanguageModel Create(string modelType, int vocabSize)
@@ -27,12 +26,12 @@ public class NGramModelFactory : INGramModelFactory
         if (payload is not JsonElement jsonElement)
             throw new ArgumentException("Payload must be a JsonElement");
 
-        
+
         if (!jsonElement.TryGetProperty("bigramProbs", out JsonElement bigramElement))
             throw new InvalidOperationException("Invalid JSON: missing bigramProbs");
 
-        
-        int vocabSize = bigramElement.GetArrayLength(); 
+
+        int vocabSize = bigramElement.GetArrayLength();
 
         if (modelType == "bigram")
         {

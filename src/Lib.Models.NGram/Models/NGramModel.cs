@@ -1,9 +1,12 @@
 ﻿using Contracts;
 using System.Text.Json;
 using Lib.Models.NGram.Serialization;
-namespace Lib.Models.NGram;
+
 public class NGramModel : ILanguageModel, INGramModel
 {
+    private const int UnknownTokenId = 0;
+    private const float ComparisonEpsilon = 0.000001f;
+
     public float[][] _probs; 
     public int VocabSize { get; set; }
     private NGramCounts counts = new NGramCounts();
@@ -38,7 +41,7 @@ public class NGramModel : ILanguageModel, INGramModel
             return false;
         }
 
-        if (model.ModelKind != this.ModelKind || model.VocabSize != this.VocabSize)
+        if (model.ModelKind != ModelKind || model.VocabSize != VocabSize)
         {
             return false;
         }
@@ -47,7 +50,7 @@ public class NGramModel : ILanguageModel, INGramModel
         {
             for (int j = 0; j < VocabSize; j++)
             {
-                if (model._probs[i][j] != this._probs[i][j])
+                if(Math.Abs(model._probs[i][j] - _probs[i][j]) > ComparisonEpsilon)
                 {
                     return false;
                 }
@@ -76,15 +79,7 @@ public class NGramModel : ILanguageModel, INGramModel
         }
 
         ResetTrainingResults();
-
-        try
-        {
-            counts.CountBigrams(_probs, tokens);
-        }
-        catch (ArgumentOutOfRangeException ex)
-        {
-            throw;
-        }
+        counts.CountBigrams(_probs, tokens);
 
         for (int i = 0; i < VocabSize; i++)
         {
@@ -103,37 +98,47 @@ public class NGramModel : ILanguageModel, INGramModel
     public float[] NextTokenScores(ReadOnlySpan<int> context)
     {
         float[] alternative = new float[VocabSize];
-        for (int i = 0; i < VocabSize; i++)
+
+        if (VocabSize > 1)
         {
-            alternative[i] = (float)1 / VocabSize;
+            float uniform = 1f / (VocabSize - 1);
+
+            for (int i = 1; i < VocabSize; i++)
+            {
+                alternative[i] = uniform;
+            }
         }
+
+        alternative[UnknownTokenId] = 0f;
 
         if (context.Length < 1)
         {
             return alternative;
         }
 
-        int lastToken = context[context.Length - 1] - 1;       
+        int lastToken = context[context.Length - 1];
 
         if (lastToken < 0 || lastToken >= VocabSize)
         {
             return alternative;
         }
 
-        bool isNull = true;
+        bool hasAnyObservedTransition = false;
 
         for (int i = 0; i < VocabSize; i++)
         {
             if (_probs[lastToken][i] != 0)
             {
-                isNull = false;
+                hasAnyObservedTransition = true;
                 break;
             }
         }
 
-        if (!isNull)
+        if (hasAnyObservedTransition)
         {
-            return (float[])_probs[lastToken].Clone();
+            float[] result = (float[])_probs[lastToken].Clone();
+            result[0] = 0f;
+            return result;
         }
 
         return alternative;
