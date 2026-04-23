@@ -404,6 +404,7 @@ FodyWeavers.xsd
 *.sln.iml
 .idea
 
+
 ##
 ## Visual studio for Mac
 ##
@@ -422,11 +423,11 @@ autom4te.cache/
 tarballs/
 test-results/
 
+
 # Mac bundle stuff
 *.dmg
 *.app
 
-# content below from: https://github.com/github/gitignore/blob/master/Global/macOS.gitignore
 # General
 .DS_Store
 .AppleDouble
@@ -455,7 +456,7 @@ Network Trash Folder
 Temporary Items
 .apdisk
 
-# content below from: https://github.com/github/gitignore/blob/master/Global/Windows.gitignore
+
 # Windows thumbnail cache files
 Thumbs.db
 ehthumbs.db
@@ -482,6 +483,7 @@ $RECYCLE.BIN/
 
 # Vim temporary swap files
 *.swp
+<<<<<<< HEAD
 
 
 bin/
