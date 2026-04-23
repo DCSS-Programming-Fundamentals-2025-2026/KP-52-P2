@@ -17,7 +17,7 @@ public class PerplexityCalculator
             int[] context = { tokens[i - 1] };
             float[] probs = model.NextTokenScores(context);
 
-            float prob = probs[tokens[i] - 1];
+            float prob = probs[tokens[i]];
 
             if (prob <= 0)
             {
@@ -58,7 +58,7 @@ public class PerplexityCalculator
                 probs = model.bigramModel.NextTokenScores(context);
             }
 
-            float prob = probs[tokens[i] - 1];
+            float prob = probs[tokens[i]];
 
             if (prob <= 0)
             {
