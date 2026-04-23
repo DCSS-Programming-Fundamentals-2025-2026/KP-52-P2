@@ -37,7 +37,7 @@ public class PerplexityCalculatorTests
     {
         // Arrange
         PerplexityCalculator calculator = new PerplexityCalculator();
-        NGramModel model = new NGramModel(3);
+        NGramModel model = new NGramModel(4);
         int[] tokens = { 2, 2, 1, 2, 2, 2, 1, 2, 2, 2, 3 };
         model.Train(tokens);
 
@@ -55,7 +55,7 @@ public class PerplexityCalculatorTests
     {
         // Arrange
         PerplexityCalculator calculator = new PerplexityCalculator();
-        TrigramModel model = new TrigramModel(4);
+        TrigramModel model = new TrigramModel(5);
         int[] tokens = { 2, 4, 1, 2, 4, 2, 1, 4, 1, 4, 3};
         model.Train(tokens);
 
