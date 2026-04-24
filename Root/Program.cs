@@ -76,40 +76,56 @@ namespace MiniChatGPT.App
                 CorpusLoader loader = new CorpusLoader(new DefaultFileSystem());
                 Corpus corpus = loader.Load(options.DataPath, new CorpusLoadOptions(Lowercase: true));
 
-                ITokenizer tokenizer;
-                ILanguageModel model;
+                ITokenizer? tokenizer = null;
+                ILanguageModel? model = null;
 
-                string effectiveModelKind;
-                string effectiveTokenizerKind;
+                string effectiveModelKind = "";
+                string effectiveTokenizerKind = "";
 
                 if (!string.IsNullOrWhiteSpace(options.OutputPath) && File.Exists(options.OutputPath))
                 {
-                    Console.WriteLine($"[Trainer] Checkpoint found. Resuming from {options.OutputPath}...");
-
-                    Checkpoint checkpoint = JsonCheckpointIO.Load(options.OutputPath);
-
-                    effectiveModelKind = checkpoint.ModelKind.ToLowerInvariant();
-                    effectiveTokenizerKind = checkpoint.TokenizerKind.ToLowerInvariant();
-
-                    if (!string.Equals(options.ModelKind, effectiveModelKind, StringComparison.OrdinalIgnoreCase))
+                    try
                     {
-                        throw new InvalidDataException(
-                            $"Checkpoint model kind '{checkpoint.ModelKind}' does not match requested '{options.ModelKind}'.");
+                        Console.WriteLine($"[Trainer] Checkpoint found. Resuming from {options.OutputPath}...");
+
+                        Checkpoint checkpoint = JsonCheckpointIO.Load(options.OutputPath);
+
+                        effectiveModelKind = checkpoint.ModelKind.ToLowerInvariant();
+                        effectiveTokenizerKind = checkpoint.TokenizerKind.ToLowerInvariant();
+
+                        if (!string.Equals(options.ModelKind, effectiveModelKind, StringComparison.OrdinalIgnoreCase))
+                        {
+                            throw new InvalidDataException(
+                                $"Checkpoint model kind '{checkpoint.ModelKind}' does not match requested '{options.ModelKind}'.");
+                        }
+
+                        if (!string.Equals(options.TokenizerKind, effectiveTokenizerKind, StringComparison.OrdinalIgnoreCase))
+                        {
+                            throw new InvalidDataException(
+                                $"Checkpoint tokenizer kind '{checkpoint.TokenizerKind}' does not match requested '{options.TokenizerKind}'.");
+                        }
+
+                        tokenizer = RestoreTokenizer(checkpoint.TokenizerKind, checkpoint.TokenizerPayload);
+                        model = RestoreModel(checkpoint.ModelKind, checkpoint.ModelPayload);
+
+                        if (model.VocabSize != tokenizer.VocabSize)
+                        {
+                            throw new InvalidDataException(
+                                $"Vocab mismatch: model vocabSize={model.VocabSize}, tokenizer vocabSize={tokenizer.VocabSize}.");
+                        }
                     }
-
-                    if (!string.Equals(options.TokenizerKind, effectiveTokenizerKind, StringComparison.OrdinalIgnoreCase))
+                    catch (Exception ex)
                     {
-                        throw new InvalidDataException(
-                            $"Checkpoint tokenizer kind '{checkpoint.TokenizerKind}' does not match requested '{options.TokenizerKind}'.");
-                    }
+                        Console.WriteLine("[Trainer] No checkpoint found. Starting new training...");
 
-                    tokenizer = RestoreTokenizer(checkpoint.TokenizerKind, checkpoint.TokenizerPayload);
-                    model = RestoreModel(checkpoint.ModelKind, checkpoint.ModelPayload);
+                        effectiveModelKind = options.ModelKind.ToLowerInvariant();
+                        effectiveTokenizerKind = options.TokenizerKind.ToLowerInvariant();
 
-                    if (model.VocabSize != tokenizer.VocabSize)
-                    {
-                        throw new InvalidDataException(
-                            $"Vocab mismatch: model vocabSize={model.VocabSize}, tokenizer vocabSize={tokenizer.VocabSize}.");
+                        tokenizer = effectiveTokenizerKind == "char"
+                            ? CharTokenizer.BuildFromText(corpus.TrainText)
+                            : WordTokenizer.BuildFromText(corpus.TrainText);
+
+                        model = CreateNewModel(effectiveModelKind, tokenizer.VocabSize, options.Seed);
                     }
                 }
                 else
