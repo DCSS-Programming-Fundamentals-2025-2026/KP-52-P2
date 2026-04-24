@@ -183,7 +183,7 @@ namespace MiniChatGPT.App
             {
                 TinyNNModelFactory factory = new TinyNNModelFactory();
                 return factory.CreateFromPayload(jsonPayload, modelKind);    
-            }
+            }                                                                        
             else if (modelKind == "tinytransformer")
             {
                 TinyTransformerModelFactory factory = new TinyTransformerModelFactory();
