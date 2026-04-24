@@ -17,6 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Root\Root.csproj" />
     <ProjectReference Include="..\..\src\Contracts\Contracts.csproj" />
     <ProjectReference Include="..\..\src\Lib.Batching\Lib.Batching.csproj" />
     <ProjectReference Include="..\..\src\Lib.Corpus\Lib.Corpus.csproj" />

@@ -13,12 +13,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "data", "data", "{3E0F152A-8
 	ProjectSection(SolutionItems) = preProject
 		data\max_trigram_data.txt = data\max_trigram_data.txt
 		data\mediumspace.txt = data\mediumspace.txt
-		data\part01.txt = data\part01.txt
 		data\sample.txt = data\sample.txt
 		data\short_input.txt = data\short_input.txt
 		data\showcase.txt = data\showcase.txt
 		data\showcase2.txt = data\showcase2.txt
 		data\showcase3.txt = data\showcase3.txt
+		data\Ukraine.txt = data\Ukraine.txt
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{8E3F8DE6-45D0-4251-A054-92255B5E2340}"
@@ -74,9 +74,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lib.Training", "src\Lib.Training\Lib.Training.csproj", "{F4513024-7559-6880-4871-87EAFD3E0F37}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "checkpoints", "checkpoints", "{5E0B1852-1ABB-43D3-B94B-7F3964804FA9}"
-	ProjectSection(SolutionItems) = preProject
-		data\checkpoints\NGramCheckpoints.json = data\checkpoints\NGramCheckpoints.json
-	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

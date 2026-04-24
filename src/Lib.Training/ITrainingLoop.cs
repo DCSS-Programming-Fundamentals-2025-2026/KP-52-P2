@@ -8,5 +8,6 @@ namespace Lib.Training;
 
 public interface ITrainingLoop
 {
-    TrainingMetrics Train(ILanguageModel model, IBatchProvider batchProvider, TrainingConfig config, BatchConfig batchConfig, int[] tokens, string checkpointPath);
+    TrainingMetrics Train(ILanguageModel model, IBatchProvider batchProvider, TrainingConfig config, BatchConfig batchConfig,
+        int[] tokens, string checkpointPath, string effectiveTokenizerKind, ITokenizer tokenizer, int? seed);
 }

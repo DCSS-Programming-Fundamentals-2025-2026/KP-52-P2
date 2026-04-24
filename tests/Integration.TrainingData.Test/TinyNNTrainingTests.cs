@@ -21,12 +21,15 @@ namespace Integration.TrainingData.Test
 
         private int _vocabSize;
         private string _modelKind;
+        private int? seed;
 
         private int[] _tokens;
                                                         
         [SetUp]
         public void Setup()
         {
+            seed = 42;
+
             _vocabSize = 4;
             _modelKind = "tinynn";
             _tokens = [0, 1, 2, 3];
@@ -52,7 +55,11 @@ namespace Integration.TrainingData.Test
             int blockSize = 2;
             BatchConfig batchConfig = new BatchConfig(batchSize, blockSize);
 
-            TrainingMetrics metrics = _trainingLoop.Train(model, batchProvider, trainingConfig, batchConfig, null, "../../../../../data/checkpoints/TinyNNCheckpoints.json");
+            Checkpoint checkpoint = JsonCheckpointIO.Load("../../../../../data/checkpoints/NGramCheckpoints.json");
+            string effectiveTokenizerKind = checkpoint.TokenizerKind.ToLowerInvariant();
+            ITokenizer tokenizer = MiniChatGPT.App.Program.RestoreTokenizer(checkpoint.TokenizerKind, checkpoint.TokenizerPayload);
+
+            TrainingMetrics metrics = _trainingLoop.Train(model, batchProvider, trainingConfig, batchConfig, null, "../../../../../data/checkpoints/TinyNNCheckpoints.json", effectiveTokenizerKind, tokenizer, seed);
 
             Assert.That(metrics.AverageLoss, Is.Not.NaN);
             Assert.That(metrics.CurrentEpoch, Is.EqualTo(10));
@@ -75,7 +82,11 @@ namespace Integration.TrainingData.Test
             int blockSize = 2;
             BatchConfig batchConfig = new BatchConfig(batchSize, blockSize);
 
-            Assert.Throws<ArgumentException>(() => _trainingLoop.Train(model, batchProvider, trainingConfig, batchConfig, null, "../../../../../data/checkpoints/TinyNNCheckpoints.json")); 
+            Checkpoint checkpoint = JsonCheckpointIO.Load("../../../../../data/checkpoints/NGramCheckpoints.json");
+            string effectiveTokenizerKind = checkpoint.TokenizerKind.ToLowerInvariant();
+            ITokenizer tokenizer = MiniChatGPT.App.Program.RestoreTokenizer(checkpoint.TokenizerKind, checkpoint.TokenizerPayload);
+
+            Assert.Throws<ArgumentException>(() => _trainingLoop.Train(model, batchProvider, trainingConfig, batchConfig, null, "../../../../../data/checkpoints/TinyNNCheckpoints.json", effectiveTokenizerKind, tokenizer, seed)); 
         }
     }
 }

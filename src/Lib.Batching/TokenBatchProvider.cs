@@ -18,8 +18,14 @@ public class TokenBatchProvider : IBatchProvider
     public Batch GetBatch(BatchConfig config, Random rng)
     {
         var tokens = _stream.GetTokens();
-        
-        var startIndices = _sampler.GetRandomStartIndices(tokens.Length, config.BatchSize, config.BlockSize, rng);
+
+        int blockSize = config.BlockSize > tokens.Length ? tokens.Length - 1: config.BlockSize;
+        if (tokens.Length < 2 || blockSize <= 0)
+        {
+            throw new ArgumentException("Створення батчу неможливе!");
+        }
+
+        var startIndices = _sampler.GetRandomStartIndices(tokens.Length, config.BatchSize, blockSize, rng);
 
         int[][] inputs = new int[config.BatchSize][];
         int[] targets = new int[config.BatchSize];
@@ -28,10 +34,10 @@ public class TokenBatchProvider : IBatchProvider
         {
             int startIndex = startIndices[i];
             
-            inputs[i] = new int[config.BlockSize];
-            Array.Copy(tokens, startIndex, inputs[i], 0, config.BlockSize);
+            inputs[i] = new int[blockSize];
+            Array.Copy(tokens, startIndex, inputs[i], 0, blockSize);
             
-            targets[i] = tokens[startIndex + config.BlockSize];
+            targets[i] = tokens[startIndex + blockSize];
         }
 
         return new Batch(inputs, targets);

@@ -17,6 +17,14 @@ namespace AcceptanceTests
 {
     public class NGramTests
     {
+        private int? seed;
+
+        [SetUp]
+        public void Setup()
+        {
+            seed = 42;
+        }
+
         [TestCase("../../../../../data/showcase.txt")]
         [TestCase("../../../../../data/showcase2.txt")]
         [TestCase("../../../../../data/showcase3.txt")]
@@ -44,7 +52,7 @@ namespace AcceptanceTests
             TrainingConfig tConfig = new TrainingConfig(100, 0.1f, 10);
             BatchConfig bConfig = new BatchConfig(50, 16);
 
-            var metrics = trainingLoop.Train(model, batchProvider, tConfig, bConfig, tokens, "../../../../../data/checkpoints/NGramCheckpoints.json");
+            var metrics = trainingLoop.Train(model, batchProvider, tConfig, bConfig, tokens, "../../../../../data/checkpoints/NGramCheckpoints.json", tokenizerKind, tokenizer, seed);
 
             Checkpoint checkpoint = new Checkpoint(
                 ModelKind: model.ModelKind,
@@ -104,7 +112,7 @@ namespace AcceptanceTests
             TrainingConfig tConfig = new TrainingConfig(100, 0.1f, 10);
             BatchConfig bConfig = new BatchConfig(50, 16);
 
-            var metrics = trainingLoop.Train(model, batchProvider, tConfig, bConfig, tokens, "../../../../../data/checkpoints/NGramCheckpoints.json");
+            var metrics = trainingLoop.Train(model, batchProvider, tConfig, bConfig, tokens, "../../../../../data/checkpoints/NGramCheckpoints.json", tokenizerKind, tokenizer, seed);
 
             Checkpoint checkpoint = new Checkpoint(
                 ModelKind: model.ModelKind,
