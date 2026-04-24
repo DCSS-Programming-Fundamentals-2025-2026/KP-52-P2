@@ -1,8 +1,6 @@
 ﻿using Contracts;
-using Lib.Models.NGram;
-using Lib.Models.Trigram;
-using Lib.Models.NGram.Serialization;
 using Lib.Models.NGram.Factories;
+
 public class NGramModelFactoryTests
 {
     [Test]
@@ -10,15 +8,13 @@ public class NGramModelFactoryTests
     {
         // Arrange
         NGramModelFactory factory = new NGramModelFactory();
+        NGramModel expectedModel = new NGramModel(4);
 
         // Act
         ILanguageModel actualModel = factory.Create("bigram", 4);
 
         // Assert
-        Assert.That(actualModel, Is.Not.Null);
-        Assert.That(actualModel, Is.InstanceOf<NGramModel>());
-
-        Assert.That(((NGramModel)actualModel).VocabSize, Is.EqualTo(4));
+        Assert.IsTrue(actualModel.Equals(expectedModel));
     }
 
     [Test]
@@ -26,14 +22,13 @@ public class NGramModelFactoryTests
     {
         // Arrange
         NGramModelFactory factory = new NGramModelFactory();
+        TrigramModel expectedModel = new TrigramModel(4);
 
         // Act
         ILanguageModel actualModel = factory.Create("trigram", 4);
 
         // Assert
-        Assert.That(actualModel, Is.Not.Null);
-        Assert.That(actualModel, Is.InstanceOf<TrigramModel>());
-        Assert.That(((TrigramModel)actualModel).VocabSize, Is.EqualTo(4));
+        Assert.IsTrue(actualModel.Equals(expectedModel));
     }
 
     [Test]

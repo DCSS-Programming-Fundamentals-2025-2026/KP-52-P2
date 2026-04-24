@@ -4,7 +4,6 @@ using Lib.Batching.Configuration;
 using Lib.Models.NGram;
 using Lib.Models.TinyNN;
 using Lib.Models.TinyTransformer;
-using Lib.Models.Trigram;
 using Lib.Training.Configuration;
 using Lib.Training.Metrics;
 using Lib.Training.Scheduling;

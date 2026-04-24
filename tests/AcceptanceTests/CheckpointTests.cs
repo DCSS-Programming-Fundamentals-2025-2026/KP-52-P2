@@ -6,7 +6,6 @@ using Lib.Batching.Streams;
 using Lib.Corpus;
 using Lib.Corpus.Configuration;
 using Lib.Corpus.Infrastructure;
-using Lib.Models.Trigram;
 using Lib.Tokenization.Application;
 using Lib.Training;
 using Lib.Training.Configuration;

@@ -6,9 +6,7 @@ using Lib.Tokenization.Domain.Model;
 using Lib.Tokenization.Infrastructure.Serialization;
 using Contracts;
 using System.Text.Json;
-using Lib.Models.Trigram;
 using Lib.Models.NGram.Factories;
-using Lib.Models.NGram;
 
 public class BaselineEndToEndTests
 {
@@ -233,7 +231,7 @@ public class BaselineEndToEndTests
         Assert.That(float.IsFinite(perplexity), Is.True);
     }
 
-    /*
+    
     [Test]
     public void Trigram_HasLowerPerplexity_ThanBigram()
     {
@@ -261,7 +259,7 @@ public class BaselineEndToEndTests
         Assert.That(perplexityTrigram, Is.GreaterThan(0));
         Assert.That(perplexityBigram, Is.GreaterThan(0));
         Assert.That(perplexityBigram, Is.GreaterThan(perplexityTrigram));
-    }*/
+    }
 
     [Test]
     public void NextTokenScores_SumsToOne_ForAllTokens()

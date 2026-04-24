@@ -1,6 +1,5 @@
-﻿using Lib.Models.NGram;
-using Lib.Models.Trigram;
-using System.Text.Json;
+﻿using System.Text.Json;
+
 namespace Lib.Models.NGram.Serialization;
 public class NGramPayloadMapper
 {
@@ -126,7 +125,6 @@ public class NGramPayloadMapper
             {
                 continue;
             }
-
 
             model._trigramProbs[(first, second)] = (float[])pair.Value.Clone();
         }
